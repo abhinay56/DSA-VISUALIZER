@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Queue Visualization</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 3 3 0 0 1 0-3.88 2.5 2.5 0 0 1 0-3.12A2.5 2.5 0 0 1 9.5 2z'/><path d='M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-3.12 3 3 0 0 0 0-3.88 2.5 2.5 0 0 0 0-3.12A2.5 2.5 0 0 0 14.5 2z'/></svg>">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+<script defer src="queue.js"></script>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+
+<div class="logo">DSA Visualizer</div>
+
+<div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+<ul class="navLinks" id="navLinks">
+<li><a href="index.html">Home</a></li>
+<li><a href="arrays.html">Arrays</a></li>
+<li><a href="stack.html">Stack</a></li>
+<li><a href="queue.html" class="active">Queue</a></li>
+<li><a href="linkedlist.html">Linked List</a></li>
+<li><a href="trees.html">Trees</a></li>
+<li><a href="graphs.html">Graphs</a></li>
+<li><a href="feedback.html">Feedback</a></li>
+</ul>
+
+<button class="themeBtn" onclick="toggleTheme()">
+<span id="themeIcon">⚙️</span>
+</button>
+
+</div>
+
+<!-- CONTAINER -->
+<div class="container">
+
+    <!-- LEFT PANEL: CONTROLS -->
+    <div class="leftPanel" style="overflow-y:auto; max-height:calc(100vh - 70px);">
+        <h2>Queue Control Panel</h2>
+        
+        <!-- Queue Type Toggle -->
+        <div>
+            <label style="font-size:14px;color:#94a3b8;font-weight:bold;">Select Queue Type</label>
+            <select id="queueType" onchange="switchQueueType(this.value)" style="width:100%; margin-top:5px; background:#1e293b; color:white; border:1px solid #475569;">
+                <option value="linear">Linear Queue</option>
+                <option value="circular">Circular Queue</option>
+            </select>
+        </div>
+
+        <hr style="border:0; border-top:1px solid #334155;">
+
+        <!-- Queue Parameters -->
+        <div class="info" style="font-size:14px; gap:8px;">
+            <p>Front Pointer (F) :- <span id="frontPtr" style="background:#ef4444; padding:2px 8px; border-radius:4px; font-weight:bold;">-1</span></p>
+            <p>Rear Pointer (R) :- <span id="rearPtr" style="background:#3b82f6; padding:2px 8px; border-radius:4px; font-weight:bold;">-1</span></p>
+            <p>Current Size :- <span id="queueSize" style="background:#10b981; padding:2px 8px; border-radius:4px; font-weight:bold;">0</span></p>
+            <p>Max Capacity :- <span style="background:#475569; padding:2px 8px; border-radius:4px; font-weight:bold;">8</span></p>
+        </div>
+
+        <hr style="border:0; border-top:1px solid #334155;">
+
+        <!-- Queue Operations -->
+        <div>
+            <label style="font-size:14px;color:#94a3b8;font-weight:bold;">Operations</label>
+            <div style="display:flex; gap:5px; margin-top:5px;">
+                <input type="text" id="enqueueValue" placeholder="Enter element" style="flex:1;">
+                <button onclick="enqueueElement()">Enqueue</button>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:8px;">
+                <button onclick="dequeueElement()" style="background:#ef4444;">Dequeue</button>
+                <button onclick="peekElement()" style="background:#fbbf24; color:black;">Peek/Front</button>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:5px;">
+                <button onclick="checkIsEmpty()" style="background:#8b5cf6;">Is Empty?</button>
+                <button onclick="checkIsFull()" style="background:#8b5cf6;">Is Full?</button>
+            </div>
+            <button onclick="clearQueue()" class="reset" style="width:100%; margin-top:8px;">Clear Queue</button>
+        </div>
+
+        <hr style="border:0; border-top:1px solid #334155;">
+
+        <!-- Animation Controls -->
+        <div>
+            <label style="font-size:14px;color:#94a3b8;font-weight:bold;">Animation Settings</label>
+            <div class="speed-control">
+                <label for="speedSlider">Speed: <span id="speedVal">1.0</span>s/step</label>
+                <input type="range" id="speedSlider" min="200" max="2500" value="1000" oninput="changeSpeed(this.value)">
+            </div>
+            <div class="playback-controls">
+                <button id="playBtn" onclick="togglePlay()" class="active-btn">Pause</button>
+                <button onclick="stepPrev()">&lt; Step</button>
+                <button onclick="stepNext()">Step &gt;</button>
+            </div>
+            <button onclick="resetAnimation()" class="reset" style="width:100%; margin-top:8px;">Reset</button>
+        </div>
+
+    </div>
+
+    <!-- MIDDLE PANEL: STAGE -->
+    <div class="middlePanel">
+        <div class="queue-stage">
+            <div id="queue-container" class="queue-container">
+                <!-- Dynamically populated slots -->
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL: EXPLANATION -->
+    <div class="explanationPanel">
+        <h2>Explanation</h2>
+        <div class="explanation-content">
+            <div class="explanation-item">
+                <span class="explanation-label">Operation</span>
+                <span id="exp-operation" class="explanation-value">-</span>
+            </div>
+            <div class="explanation-item" id="exp-val-container" style="display:none;">
+                <span id="exp-val-label" class="explanation-label">Value</span>
+                <span id="exp-val-value" class="explanation-value">-</span>
+            </div>
+            <div class="explanation-item">
+                <span class="explanation-label">Description</span>
+                <div id="explanation" class="explanation-desc">Linear queue of capacity 8 initialized. Enqueue elements to watch pointers move.</div>
+            </div>
+            <div class="explanation-item" id="exp-extra-container" style="display:none;"></div>
+            <div class="explanation-item">
+                <span class="explanation-label">Time Complexity</span>
+                <span id="exp-time" class="explanation-value">-</span>
+            </div>
+            <div class="explanation-item">
+                <span class="explanation-label">Space Complexity</span>
+                <span id="exp-space" class="explanation-value">-</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

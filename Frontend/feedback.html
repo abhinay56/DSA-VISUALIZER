@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback - DSA Visualizer</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 3 3 0 0 1 0-3.88 2.5 2.5 0 0 1 0-3.12A2.5 2.5 0 0 1 9.5 2z'/><path d='M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-3.12 3 3 0 0 0 0-3.88 2.5 2.5 0 0 0 0-3.12A2.5 2.5 0 0 0 14.5 2z'/></svg>">
+    <link rel="stylesheet" href="style.css">
+    <script src="theme.js"></script>
+    <style>
+        .feedback-layout {
+            max-width: 800px;
+            margin: 120px auto 40px auto;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .feedback-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .feedback-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .feedback-header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .reviews-wall {
+            margin-top: 60px;
+        }
+
+        .reviews-wall h2 {
+            font-size: 1.8rem;
+            color: #f1f5f9;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .light-mode .reviews-wall h2 {
+            color: #1e293b;
+            border-bottom-color: #e2e8f0;
+        }
+
+        .reviews-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .review-item {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .neon-mode .review-item {
+            background: #090014;
+            border-color: #3b0764;
+        }
+
+        .light-mode .review-item {
+            background: #ffffff;
+            border-color: #e2e8f0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .review-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .review-user-name {
+            font-weight: bold;
+            color: #f1f5f9;
+            font-size: 1.05rem;
+        }
+
+        .light-mode .review-user-name {
+            color: #1e293b;
+        }
+
+        .review-user-email {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-left: 8px;
+        }
+
+        .review-rating {
+            color: #fbbf24;
+            font-size: 1.1rem;
+        }
+
+        .review-text {
+            color: #cbd5e1;
+            line-height: 1.5;
+            word-break: break-word;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .light-mode .review-text {
+            color: #475569;
+        }
+
+        .admin-delete-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .admin-delete-btn:hover {
+            background: #dc2626;
+        }
+
+        .admin-indicator {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid #10b981;
+            color: #10b981;
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .admin-indicator:hover {
+            background: rgba(16, 185, 129, 0.25);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="logo">DSA Visualizer</div>
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+        <ul class="navLinks" id="navLinks">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="arrays.html">Arrays</a></li>
+            <li><a href="stack.html">Stack</a></li>
+            <li><a href="queue.html">Queue</a></li>
+            <li><a href="linkedlist.html">Linked List</a></li>
+            <li><a href="trees.html">Trees</a></li>
+            <li><a href="graphs.html">Graphs</a></li>
+            <li><a href="feedback.html" class="active">Feedback</a></li>
+        </ul>
+
+        <button class="themeBtn" onclick="toggleTheme()">
+            <span id="themeIcon">⚙️</span>
+        </button>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="feedback-layout">
+        <div class="feedback-header">
+            <h1>User Feedback</h1>
+            <p>Tell us about your experience using the DSA Visualizer!</p>
+        </div>
+
+        <!-- FORM CARD -->
+        <div class="learn-card" style="padding: 35px; box-sizing: border-box;">
+            <form id="feedbackForm" onsubmit="submitForm(event)" style="display: flex; flex-direction: column; gap: 18px;">
+                <div>
+                    <label style="font-size: 14px; color: #94a3b8; display: block; margin-bottom: 6px;">Name</label>
+                    <input type="text" id="fbName" required style="width: 100%; padding: 11px; border: 1px solid #475569; background: #0f172a; color: white; border-radius: 6px; box-sizing: border-box; outline: none; transition: border-color 0.3s;">
+                </div>
+                <div>
+                    <label style="font-size: 14px; color: #94a3b8; display: block; margin-bottom: 6px;">Gmail</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="email" id="fbEmail" required style="flex-grow: 1; padding: 11px; border: 1px solid #475569; background: #0f172a; color: white; border-radius: 6px; box-sizing: border-box; outline: none; transition: border-color 0.3s;">
+                        <button type="button" id="btnSendOtp" onclick="sendOtp()" style="background: #3b82f6; color: white; border: none; border-radius: 6px; padding: 0 15px; font-weight: bold; cursor: pointer; transition: all 0.3s; white-space: nowrap;">Send OTP</button>
+                    </div>
+                </div>
+                <div id="otpContainer" style="display: none;">
+                    <label style="font-size: 14px; color: #94a3b8; display: block; margin-bottom: 6px;">Enter OTP (Check email/terminal log)</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="fbOtp" placeholder="6-digit code" maxlength="6" style="flex-grow: 1; padding: 11px; border: 1px solid #475569; background: #0f172a; color: white; border-radius: 6px; box-sizing: border-box; outline: none; text-align: center; font-weight: bold; letter-spacing: 2px;">
+                        <button type="button" id="btnVerifyOtp" onclick="verifyOtp()" style="background: #10b981; color: white; border: none; border-radius: 6px; padding: 0 15px; font-weight: bold; cursor: pointer; transition: all 0.3s; white-space: nowrap;">Verify OTP</button>
+                    </div>
+                    <div id="otpStatus" style="font-size: 13px; margin-top: 5px;"></div>
+                </div>
+                <div>
+                    <label style="font-size: 14px; color: #94a3b8; display: block; margin-bottom: 6px;">Rating</label>
+                    <div class="star-rating" style="display: flex; gap: 8px; font-size: 32px; cursor: pointer; user-select: none;">
+                        <span class="star" data-value="1" onclick="setRating(1)" onmouseover="hoverStars(1)" onmouseout="resetStars()" style="color: #475569; transition: color 0.2s;">★</span>
+                        <span class="star" data-value="2" onclick="setRating(2)" onmouseover="hoverStars(2)" onmouseout="resetStars()" style="color: #475569; transition: color 0.2s;">★</span>
+                        <span class="star" data-value="3" onclick="setRating(3)" onmouseover="hoverStars(3)" onmouseout="resetStars()" style="color: #475569; transition: color 0.2s;">★</span>
+                        <span class="star" data-value="4" onclick="setRating(4)" onmouseover="hoverStars(4)" onmouseout="resetStars()" style="color: #475569; transition: color 0.2s;">★</span>
+                        <span class="star" data-value="5" onclick="setRating(5)" onmouseover="hoverStars(5)" onmouseout="resetStars()" style="color: #475569; transition: color 0.2s;">★</span>
+                    </div>
+                    <input type="hidden" id="fbRating" value="0" required>
+                </div>
+                <div>
+                    <label style="font-size: 14px; color: #94a3b8; display: block; margin-bottom: 6px;">Review (max 500 characters)</label>
+                    <textarea id="fbReview" maxlength="500" required oninput="updateCharCount()" style="width: 100%; height: 120px; padding: 11px; border: 1px solid #475569; background: #0f172a; color: white; border-radius: 6px; box-sizing: border-box; resize: none; outline: none; font-family: inherit; transition: border-color 0.3s;"></textarea>
+                    <div id="charCounter" style="font-size: 12px; color: #64748b; text-align: right; margin-top: 5px;">0 / 500 characters</div>
+                </div>
+                <button type="submit" id="btnSubmitFeedback" class="btn-learn" style="width: 100%; padding: 13px; font-size: 1rem; border-radius: 6px; opacity: 0.6; cursor: not-allowed;" disabled>Submit Feedback</button>
+            </form>
+            <div id="fbSuccess" style="display: none; text-align: center; color: #22c55e; font-weight: bold; padding: 20px 10px; font-size: 1.1rem;">
+                🎉 Thank you! Your review has been added.
+            </div>
+        </div>
+
+        <!-- REVIEWS WALL -->
+        <div class="reviews-wall">
+            <h2>
+                <span>User Reviews & Ratings</span>
+            </h2>
+            <div id="reviewsGrid" class="reviews-grid">
+                <!-- Reviews will be loaded dynamically here -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- BACKGROUND -->
+    <div class="bubbles">
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+
+
+        let currentRating = 0;
+
+        function setRating(val) {
+            currentRating = val;
+            document.getElementById("fbRating").value = val;
+            highlightStars(val);
+        }
+
+        function hoverStars(val) {
+            highlightStars(val);
+        }
+
+        function resetStars() {
+            highlightStars(currentRating);
+        }
+
+        function highlightStars(val) {
+            const stars = document.querySelectorAll(".star-rating .star");
+            stars.forEach((star, idx) => {
+                if (idx < val) {
+                    star.style.color = "#fbbf24";
+                } else {
+                    star.style.color = "#475569";
+                }
+            });
+        }
+
+        function updateCharCount() {
+            const textarea = document.getElementById("fbReview");
+            const counter = document.getElementById("charCounter");
+            counter.innerText = `${textarea.value.length} / 500 characters`;
+        }
+
+        let isOtpVerified = false;
+        let otpCountdownInterval = null;
+
+        async function sendOtp() {
+            const emailInput = document.getElementById("fbEmail");
+            const email = emailInput.value.trim();
+            
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                alert("Please enter a valid Gmail address first!");
+                return;
+            }
+            
+            const btnSend = document.getElementById("btnSendOtp");
+            btnSend.disabled = true;
+            btnSend.innerText = "Sending...";
+            btnSend.style.opacity = "0.7";
+            
+            try {
+                const res = await fetch("/api/send-otp", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email })
+                });
+                
+                if (res.ok) {
+                    document.getElementById("otpContainer").style.display = "block";
+                    const status = document.getElementById("otpStatus");
+                    status.style.color = "#38bdf8";
+                    status.innerText = "Verification code has been sent! Check your inbox or terminal console log.";
+                    
+                    let secondsLeft = 60;
+                    if (otpCountdownInterval) clearInterval(otpCountdownInterval);
+                    
+                    otpCountdownInterval = setInterval(() => {
+                        secondsLeft--;
+                        if (secondsLeft <= 0) {
+                            clearInterval(otpCountdownInterval);
+                            btnSend.disabled = false;
+                            btnSend.style.opacity = "1";
+                            btnSend.innerText = "Resend OTP";
+                        } else {
+                            btnSend.innerText = `Resend (${secondsLeft}s)`;
+                        }
+                    }, 1000);
+                } else {
+                    alert("Failed to send OTP. Please try again.");
+                    btnSend.disabled = false;
+                    btnSend.style.opacity = "1";
+                    btnSend.innerText = "Send OTP";
+                }
+            } catch (err) {
+                console.error("Error sending OTP:", err);
+                alert("Failed to send OTP. Please check your connection.");
+                btnSend.disabled = false;
+                btnSend.style.opacity = "1";
+                btnSend.innerText = "Send OTP";
+            }
+        }
+
+        async function verifyOtp() {
+            const email = document.getElementById("fbEmail").value.trim();
+            const otp = document.getElementById("fbOtp").value.trim();
+            
+            if (!otp || otp.length !== 6) {
+                alert("Please enter the 6-digit OTP code!");
+                return;
+            }
+            
+            const btnVerify = document.getElementById("btnVerifyOtp");
+            btnVerify.disabled = true;
+            btnVerify.innerText = "Verifying...";
+            
+            try {
+                const res = await fetch("/api/verify-otp", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, otp })
+                });
+                
+                const data = await res.json();
+                const status = document.getElementById("otpStatus");
+                
+                if (res.ok) {
+                    isOtpVerified = true;
+                    status.style.color = "#10b981";
+                    status.innerText = "✓ Gmail verified successfully!";
+                    
+                    document.getElementById("fbEmail").disabled = true;
+                    document.getElementById("fbOtp").disabled = true;
+                    document.getElementById("btnSendOtp").disabled = true;
+                    btnVerify.disabled = true;
+                    if (otpCountdownInterval) clearInterval(otpCountdownInterval);
+                    
+                    const submitBtn = document.getElementById("btnSubmitFeedback");
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = "1";
+                    submitBtn.style.cursor = "pointer";
+                } else {
+                    status.style.color = "#ef4444";
+                    status.innerText = `✗ Verification failed: ${data.error || "Incorrect OTP"}`;
+                    btnVerify.disabled = false;
+                    btnVerify.innerText = "Verify OTP";
+                }
+            } catch (err) {
+                console.error("Error verifying OTP:", err);
+                alert("An error occurred during verification.");
+                btnVerify.disabled = false;
+                btnVerify.innerText = "Verify OTP";
+            }
+        }
+
+        async function submitForm(event) {
+            event.preventDefault();
+            if (!isOtpVerified) {
+                alert("Please verify your Gmail with OTP before submitting feedback!");
+                return;
+            }
+            if (currentRating === 0) {
+                alert("Please select a star rating!");
+                return;
+            }
+
+            const name = document.getElementById("fbName").value;
+            // Get email value from disabled element (still readable via JS)
+            const email = document.getElementById("fbEmail").value;
+            const review = document.getElementById("fbReview").value;
+
+            try {
+                const res = await fetch("/api/feedbacks", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ name, email, rating: currentRating, review })
+                });
+
+                if (res.ok) {
+                    document.getElementById("feedbackForm").style.display = "none";
+                    document.getElementById("fbSuccess").style.display = "block";
+
+                    setTimeout(() => {
+                        document.getElementById("feedbackForm").reset();
+                        
+                        // Re-enable input fields for next feedback
+                        document.getElementById("fbEmail").disabled = false;
+                        document.getElementById("fbOtp").disabled = false;
+                        document.getElementById("btnSendOtp").disabled = false;
+                        document.getElementById("btnSendOtp").innerText = "Send OTP";
+                        document.getElementById("btnSendOtp").style.opacity = "1";
+                        document.getElementById("btnVerifyOtp").disabled = false;
+                        document.getElementById("btnVerifyOtp").innerText = "Verify OTP";
+                        document.getElementById("otpContainer").style.display = "none";
+                        document.getElementById("otpStatus").innerText = "";
+                        
+                        const submitBtn = document.getElementById("btnSubmitFeedback");
+                        submitBtn.disabled = true;
+                        submitBtn.style.opacity = "0.6";
+                        submitBtn.style.cursor = "not-allowed";
+                        isOtpVerified = false;
+
+                        document.getElementById("feedbackForm").style.display = "flex";
+                        document.getElementById("fbSuccess").style.display = "none";
+                        setRating(0);
+                        updateCharCount();
+                        fetchReviews();
+                    }, 3000);
+                } else {
+                    const data = await res.json();
+                    alert(`Error submitting feedback: ${data.error || "Please try again."}`);
+                }
+            } catch (err) {
+                console.error("Error submitting form:", err);
+            }
+        }
+
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        let allReviews = [];
+
+        async function fetchReviews() {
+            try {
+                const res = await fetch("/api/feedbacks");
+                const data = await res.json();
+                allReviews = data;
+                renderReviews();
+            } catch (err) {
+                console.error("Error fetching reviews:", err);
+            }
+        }
+
+
+        function renderReviews() {
+            const grid = document.getElementById("reviewsGrid");
+            if (!grid) return;
+            
+            if (allReviews.length === 0) {
+                grid.innerHTML = `<p style="text-align: center; color: #64748b; margin-top: 20px;">No reviews yet. Be the first to submit!</p>`;
+                return;
+            }
+            
+            grid.innerHTML = allReviews.map(r => {
+                const stars = "★".repeat(r.rating) + "☆".repeat(5 - r.rating);
+                
+                return `
+                    <div class="review-item">
+                        <div class="review-item-header">
+                            <div>
+                                <span class="review-user-name">${escapeHtml(r.name)}</span>
+                                <span class="review-user-email">(${escapeHtml(r.email)})</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <span class="review-rating">${stars}</span>
+                            </div>
+                        </div>
+                        <p class="review-text">${escapeHtml(r.review)}</p>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        // Load reviews when the script is loaded
+        fetchReviews();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "dsa-visualizer-backend",
+  "version": "1.0.0",
+  "description": "Backend static server for DSA Visualizer",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^4.19.2",
+    "nodemailer": "^9.0.4"
+  }
+}

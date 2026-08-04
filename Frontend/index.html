@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA Visualizer</title>
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 3 3 0 0 1 0-3.88 2.5 2.5 0 0 1 0-3.12A2.5 2.5 0 0 1 9.5 2z'/><path d='M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-3.12 3 3 0 0 0 0-3.88 2.5 2.5 0 0 0 0-3.12A2.5 2.5 0 0 0 14.5 2z'/></svg>">
+    <link rel="stylesheet" href="style.css">
+    <script src="theme.js"></script>
+    <style>
+        .learn-container {
+            max-width: 1200px;
+            margin: 60px auto 40px auto;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .learn-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .learn-subtitle {
+            text-align: center;
+            color: #94a3b8;
+            margin-bottom: 50px;
+            font-size: 1.1rem;
+        }
+
+        .light-mode .learn-subtitle {
+            color: #475569;
+        }
+
+        .light-mode .hero p {
+            color: #475569;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .learn-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .neon-mode .learn-card {
+            background: #090014;
+            border-color: #3b0764;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.1);
+        }
+
+        .light-mode .learn-card {
+            background: #ffffff;
+            border-color: #e2e8f0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .learn-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+            border-color: #3b82f6;
+        }
+
+        .neon-mode .learn-card:hover {
+            box-shadow: 0 0 20px rgba(217, 70, 239, 0.4);
+            border-color: #d946ef;
+        }
+
+        .light-mode .learn-card:hover {
+            border-color: #2563eb;
+        }
+
+        .learn-card h2 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: #f1f5f9;
+        }
+
+        .light-mode .learn-card h2 {
+            color: #1e293b;
+        }
+
+        .learn-card p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .topics-list {
+            margin: 0 0 25px 0;
+            padding: 0 0 0 20px;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+
+        .light-mode .topics-list {
+            color: #475569;
+        }
+
+        .light-mode .learn-card p {
+            color: #475569;
+        }
+
+        .topics-list li {
+            margin-bottom: 6px;
+        }
+
+        .btn-learn {
+            display: inline-block;
+            background: #3b82f6;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background 0.3s;
+            cursor: pointer;
+            border: none;
+            outline: none;
+        }
+
+        .btn-learn:hover {
+            background: #2563eb;
+        }
+
+        .neon-mode .btn-learn {
+            background: #d946ef;
+        }
+
+        .neon-mode .btn-learn:hover {
+            background: #c084fc;
+        }
+
+        /* Detail container styling */
+        .detail-view {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 40px;
+            color: #cbd5e1;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .neon-mode .detail-view {
+            background: #090014;
+            border-color: #3b0764;
+        }
+
+        .light-mode .detail-view {
+            background: #ffffff;
+            border-color: #e2e8f0;
+            color: #475569;
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .light-mode .detail-header {
+            border-bottom-color: #e2e8f0;
+        }
+
+        .detail-header h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            color: #f1f5f9;
+        }
+
+        .light-mode .detail-header h1 {
+            color: #1e293b;
+        }
+
+        .btn-back {
+            background: transparent;
+            color: #94a3b8;
+            border: 1px solid #475569;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-back:hover {
+            background: #334155;
+            color: white;
+        }
+
+        .light-mode .btn-back:hover {
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .detail-section {
+            margin-bottom: 35px;
+        }
+
+        .detail-section h3 {
+            color: #60a5fa;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            border-left: 4px solid #3b82f6;
+            padding-left: 10px;
+        }
+
+        .neon-mode .detail-section h3 {
+            color: #c084fc;
+            border-left-color: #d946ef;
+        }
+
+        .detail-section p {
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        .bullets-container {
+            padding-left: 20px;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        .bullets-container li {
+            margin-bottom: 8px;
+        }
+
+        /* Complexity Table */
+        .complexity-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.95rem;
+        }
+
+        .complexity-table th,
+        .complexity-table td {
+            border: 1px solid #334155;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .light-mode .complexity-table th,
+        .light-mode .complexity-table td {
+            border-color: #e2e8f0;
+        }
+
+        .complexity-table th {
+            background: rgba(0, 0, 0, 0.2);
+            color: #f1f5f9;
+            font-weight: bold;
+        }
+
+        .light-mode .complexity-table th {
+            background: #f8fafc;
+            color: #1e293b;
+        }
+
+        .complexity-table tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .light-mode .complexity-table tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        /* Visual Illustration Styling */
+        .diagram-container {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .light-mode .diagram-container {
+            background: #f8fafc;
+            border-color: #e2e8f0;
+        }
+
+        .btn-try {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            text-align: center;
+            margin-top: 20px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-try:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .neon-mode .btn-try {
+            background: linear-gradient(135deg, #d946ef, #a855f7);
+            box-shadow: 0 0 15px rgba(217, 70, 239, 0.4);
+        }
+
+        /* Review Item styling for wall */
+        .review-item {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .neon-mode .review-item {
+            background: #090014;
+            border-color: #3b0764;
+        }
+
+        .light-mode .review-item {
+            background: #ffffff;
+            border-color: #e2e8f0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            color: #475569;
+        }
+
+        .reviews-carousel-wrapper {
+            position: relative;
+            width: 100%;
+            margin: 0 auto;
+            padding: 10px 10px 25px 10px;
+        }
+
+        .review-stack {
+            position: relative;
+            z-index: 1;
+        }
+
+        .review-stack::before,
+        .review-stack::after {
+            content: '';
+            position: absolute;
+            left: 15px;
+            right: 15px;
+            height: 100%;
+            border-radius: 10px;
+            z-index: -1;
+            transition: all 0.3s ease;
+        }
+
+        .review-stack::before {
+            bottom: -8px;
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(51, 65, 85, 0.7);
+            transform: scale(0.97);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .review-stack::after {
+            bottom: -16px;
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(51, 65, 85, 0.4);
+            transform: scale(0.94);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .neon-mode .review-stack::before {
+            background: rgba(9, 0, 20, 0.7);
+            border-color: rgba(59, 7, 100, 0.7);
+        }
+
+        .neon-mode .review-stack::after {
+            background: rgba(9, 0, 20, 0.4);
+            border-color: rgba(59, 7, 100, 0.4);
+        }
+
+        .light-mode .review-stack::before {
+            background: rgba(241, 245, 249, 0.95);
+            border-color: rgba(226, 232, 240, 0.95);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
+        }
+
+        .light-mode .review-stack::after {
+            background: rgba(241, 245, 249, 0.6);
+            border-color: rgba(226, 232, 240, 0.6);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        /* Custom text colors for reviews in both dark/neon and light modes */
+        .review-user-name {
+            font-weight: bold;
+            color: #f1f5f9;
+            font-size: 1.05rem;
+        }
+
+        .review-user-email {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-left: 8px;
+        }
+
+        .review-text {
+            color: #cbd5e1;
+            line-height: 1.5;
+            word-break: break-word;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .light-mode .review-user-name {
+            color: #0f172a;
+        }
+
+        .light-mode .review-user-email {
+            color: #475569;
+        }
+
+        .light-mode .review-text {
+            color: #334155;
+        }
+
+        #reviewsWallSection h2 {
+            color: #f1f5f9;
+            border-bottom-color: #334155;
+        }
+
+        .light-mode #reviewsWallSection h2 {
+            color: #0f172a !important;
+            border-bottom-color: #cbd5e1 !important;
+        }
+
+        /* Carousel card content transition */
+        .review-card-content {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .review-card-content.fade-out {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        .review-card-content.fade-in {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        /* Floating Settings Theme Button - Minimalist gear icon styling */
+        .floating-theme-btn {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            z-index: 2000;
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.75;
+        }
+
+        .floating-theme-btn:hover {
+            transform: rotate(90deg) scale(1.1);
+            color: #ffffff;
+            opacity: 1;
+        }
+
+        .light-mode .floating-theme-btn {
+            color: #475569;
+        }
+
+        .light-mode .floating-theme-btn:hover {
+            color: #0f172a;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- FLOATING SETTINGS / THEME SWITCHER -->
+    <button class="themeBtn floating-theme-btn" onclick="toggleTheme()" aria-label="Toggle Theme">
+        <span id="themeIcon">⚙️</span>
+    </button>
+
+    <!-- HERO -->
+    <section class="hero">
+        <h1>Interactive Data Structure Visualizer</h1>
+        <p>Learn algorithms visually like <b>VisuAlgo</b></p>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features">
+        <a href="arrays.html" class="card">Arrays</a>
+        <a href="stack.html" class="card">Stack</a>
+        <a href="queue.html" class="card">Queue</a>
+        <a href="linkedlist.html" class="card">Linked List</a>
+        <a href="trees.html" class="card">Trees</a>
+        <a href="graphs.html" class="card">Graphs</a>
+    </section>
+
+    <!-- EDUCATIONAL SECTION -->
+    <div class="learn-container">
+        <!-- DASHBOARD VIEW -->
+        <div id="dashboard">
+            <h1 class="learn-title">Learn Data Structures</h1>
+            <p class="learn-subtitle">Explore definitions, complexities, real-world use cases, and diagrams</p>
+
+            <div class="cards-grid">
+                <!-- ARRAYS CARD -->
+                <div class="learn-card">
+                    <h2>Arrays</h2>
+                    <p>A contiguous block of memory storing elements of the same type. Great for indexed lookups and
+                        sequential access.</p>
+                    <ul class="topics-list">
+                        <li>Introduction & Characteristics</li>
+                        <li>Contiguous Memory Layout</li>
+                        <li>Insertion & Deletion Operations</li>
+                        <li>Applications & Time Complexities</li>
+                    </ul>
+                    <button class="btn-learn" onclick="showDetail('arrays')">Click to Learn</button>
+                </div>
+
+                <!-- STACK CARD -->
+                <div class="learn-card">
+                    <h2>Stack</h2>
+                    <p>A Last-In, First-Out (LIFO) structure. Perfect for managing local variables, reversing data, and
+                        call history tracking.</p>
+                    <ul class="topics-list">
+                        <li>LIFO (Last-In, First-Out) Concept</li>
+                        <li>Push & Pop Operations</li>
+                        <li>Top & Peek Inspections</li>
+                        <li>Complexity analysis & Use Cases</li>
+                    </ul>
+                    <button class="btn-learn" onclick="showDetail('stack')">Click to Learn</button>
+                </div>
+
+                <!-- QUEUE CARD -->
+                <div class="learn-card">
+                    <h2>Queue</h2>
+                    <p>A First-In, First-Out (FIFO) linear structure. Essential for buffer management, job scheduling,
+                        and breadth-first search.</p>
+                    <ul class="topics-list">
+                        <li>FIFO (First-In, First-Out) Flow</li>
+                        <li>Enqueue & Dequeue Operations</li>
+                        <li>Circular & Priority Queues</li>
+                        <li>Time/Space complexity tables</li>
+                    </ul>
+                    <button class="btn-learn" onclick="showDetail('queue')">Click to Learn</button>
+                </div>
+
+                <!-- LINKED LIST CARD -->
+                <div class="learn-card">
+                    <h2>Linked Lists</h2>
+                    <p>Non-contiguous nodes connected by pointer addresses. Highly efficient for dynamic size changes
+                        and node insertions.</p>
+                    <ul class="topics-list">
+                        <li>Singly & Doubly structures</li>
+                        <li>Circular Linked List connections</li>
+                        <li>Pointer references & manipulation</li>
+                        <li>Advantages vs. Arrays</li>
+                    </ul>
+                    <button class="btn-learn" onclick="showDetail('linkedlist')">Click to Learn</button>
+                </div>
+
+                <!-- TREES CARD -->
+                <div class="learn-card">
+                    <h2>Trees</h2>
+                    <p>Hierarchical parent-child collections. Allows efficient hierarchical query operations and binary
+                        search partitioning.</p>
+                    <ul class="topics-list">
+                        <li>Binary Tree & Search Properties</li>
+                        <li>Balanced AVL Trees & Heap trees</li>
+                        <li>B-Trees & B+ Trees in Databases</li>
+                        <li>Pre-order, In-order, Post-order Traversals</li>
+                    </ul>
+                    <button class="btn-learn" onclick="showDetail('trees')">Click to Learn</button>
+                </div>
+
+                <!-- GRAPHS CARD -->
+                <div class="learn-card">
+                    <h2>Graphs</h2>
+                    <p>Non-linear node clusters connected by pathways. Maps relationships, networking connections, and
+                        routing maps.</p>
+                    <ul class="topics-list">
+                        <li>Directed, Undirected & Weighted paths</li>
+                        <li>Adjacency List vs Matrix representations</li>
+                        <li>Breadth-First & Depth-First Traversal</li>
+                        <li>DAG & Complete Connection definitions</li>
+                    </ul>
+                    <button class="btn-learn" onclick="showDetail('graphs')">Click to Learn</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- DETAIL CONTENT VIEW -->
+        <div id="detail-view" style="display:none;" class="detail-view">
+            <!-- Dynamic Content Injected here -->
+        </div>
+    </div>
+
+    <!-- REVIEWS WALL -->
+    <div id="reviewsWallSection" class="learn-container" style="margin-top: 80px;">
+        <h2
+            style="font-size: 2rem; margin-bottom: 25px; border-bottom: 1px solid; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <span>User Reviews & Ratings</span>
+            <a href="feedback.html"
+                style="background: linear-gradient(135deg, #2563eb, #7c3aed); color: white; text-decoration: none; font-size: 0.9rem; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2); transition: all 0.3s;"
+                class="btn-give-feedback">Give Feedback →</a>
+        </h2>
+        <div id="reviewsContainer" style="display: flex; flex-direction: column; gap: 20px;">
+            <!-- Reviews will be loaded here dynamically -->
+        </div>
+    </div>
+
+    <!-- REDESIGNED FOOTER -->
+    <footer id="footerSection"
+        style="margin-top: 100px; padding: 60px 40px 30px 40px; background: #07020d; border-top: 1px solid #3b0764; color: #94a3b8; font-size: 0.95rem; position: relative; z-index: 10;">
+        <div
+            style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px;">
+            <!-- Column 1: Logo & Tagline -->
+            <div style="display: flex; flex-direction: column; gap: 15px; text-align: left;">
+                <div
+                    style="font-size: 24px; font-weight: bold; color: white; display: flex; align-items: center; gap: 8px;">
+                    DSA Visualizer
+                </div>
+                <p style="margin: 0; line-height: 1.6; font-size: 0.95rem; color: #64748b;">
+                    An interactive guide designed to simplify complex algorithms and data structures through live
+                    visualization.
+                </p>
+                <div style="font-size: 0.9rem; display: flex; flex-direction: column; gap: 8px; margin-top: 5px;">
+                    <span style="color: #cbd5e1;">❤️ Made with ♥ by Abhinay Gaddam</span>
+                    <span style="color: #60a5fa; display: flex; align-items: center; gap: 6px;">
+                        ✉️ Contact: <a href="mailto:mail2abhinaygaddam6@gmail.com"
+                            style="color: #60a5fa; text-decoration: none; font-weight: bold;">mail2abhinaygaddam6@gmail.com</a>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Column 2: Navigation -->
+            <div style="display: flex; flex-direction: column; gap: 15px; text-align: left;">
+                <h4 style="margin: 0; color: white; font-size: 1.05rem; letter-spacing: 0.05em; font-weight: bold;">
+                    NAVIGATION</h4>
+                <ul
+                    style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; font-size: 0.95rem;">
+                    <li><a href="index.html"
+                            style="color: #94a3b8; text-decoration: none; display: flex; align-items: center; gap: 8px;"
+                            onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">🏠 Home</a>
+                    </li>
+                    <li><a href="arrays.html"
+                            style="color: #94a3b8; text-decoration: none; display: flex; align-items: center; gap: 8px;"
+                            onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">📊 Arrays</a>
+                    </li>
+                    <li><a href="stack.html"
+                            style="color: #94a3b8; text-decoration: none; display: flex; align-items: center; gap: 8px;"
+                            onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">🥞 Stack</a>
+                    </li>
+                    <li><a href="queue.html"
+                            style="color: #94a3b8; text-decoration: none; display: flex; align-items: center; gap: 8px;"
+                            onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">👥 Queue</a>
+                    </li>
+                    <li><a href="linkedlist.html"
+                            style="color: #94a3b8; text-decoration: none; display: flex; align-items: center; gap: 8px;"
+                            onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">🔗 Linked
+                            List</a></li>
+                    <li><a href="trees.html"
+                            style="color: #94a3b8; text-decoration: none; display: flex; align-items: center; gap: 8px;"
+                            onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">🌳 Trees</a>
+                    </li>
+                    <li><a href="graphs.html"
+                            style="color: #94a3b8; text-decoration: none; display: flex; align-items: center; gap: 8px;"
+                            onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">🌐 Graphs</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Column 3: Legal & Connect -->
+            <div style="display: flex; flex-direction: column; gap: 20px; text-align: left;">
+                <div>
+                    <h4
+                        style="margin: 0 0 15px 0; color: white; font-size: 1.05rem; letter-spacing: 0.05em; font-weight: bold;">
+                        LEGAL</h4>
+                    <ul
+                        style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; font-size: 0.95rem;">
+                        <li><a href="#" style="color: #94a3b8; text-decoration: none;"
+                                onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">Privacy
+                                Policy</a></li>
+                        <li><a href="#" style="color: #94a3b8; text-decoration: none;"
+                                onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">Terms of
+                                Service</a></li>
+                        <li><a href="#" style="color: #94a3b8; text-decoration: none;"
+                                onmouseover="this.style.color='white'"
+                                onmouseout="this.style.color='#94a3b8'">Cookies</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4
+                        style="margin: 0 0 10px 0; color: white; font-size: 1.05rem; letter-spacing: 0.05em; font-weight: bold;">
+                        CONNECT</h4>
+                    <div style="display: flex; gap: 12px; margin-top: 10px;">
+                        <!-- LinkedIn icon button -->
+                        <a href="https://www.linkedin.com/in/abhinay56/" target="_blank"
+                            style="width: 40px; height: 40px; border-radius: 50%; background: #1e1b4b; border: 1px solid #312e81; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; transition: all 0.3s;"
+                            onmouseover="this.style.borderColor='#60a5fa'; this.style.background='#3b82f6';"
+                            onmouseout="this.style.borderColor='#312e81'; this.style.background='#1e1b4b';">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                            </svg>
+                        </a>
+                        <!-- GitHub icon button -->
+                        <a href="https://github.com/abhinay56" target="_blank"
+                            style="width: 40px; height: 40px; border-radius: 50%; background: #1e1b4b; border: 1px solid #312e81; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; transition: all 0.3s;"
+                            onmouseover="this.style.borderColor='#c084fc'; this.style.background='#475569';"
+                            onmouseout="this.style.borderColor='#312e81'; this.style.background='#1e1b4b';">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom sub-row -->
+        <div
+            style="max-width: 1200px; margin: 40px auto 0 auto; padding-top: 25px; border-top: 1px solid #1e1b4b; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; font-size: 0.9rem; color: #64748b;">
+            <div>
+                &copy; 2026 DSAVisualizer. All rights reserved.
+            </div>
+            <div style="display: flex; gap: 20px;">
+                <a href="#" style="color: #64748b; text-decoration: none;" onmouseover="this.style.color='white'"
+                    onmouseout="this.style.color='#64748b'">Sitemap</a>
+                <span style="color: #1e1b4b;">|</span>
+                <a href="#" style="color: #64748b; text-decoration: none;" onmouseover="this.style.color='white'"
+                    onmouseout="this.style.color='#64748b'">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- BACKGROUND -->
+    <div class="bubbles">
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+    </div>
+
+
+
+    <!-- DATA STRUCTURES CONTENT SCRIPT -->
+    <script>
+        const dsContent = {
+            arrays: {
+                title: "Arrays",
+                overview: "An Array is a collection of elements of the same data type stored in contiguous memory locations. It is a linear data structure that enables fast access to any element using its numerical index (0-based).",
+                applications: [
+                    "Database Indexes: Arrays are used for basic key-value tables and indexing algorithms.",
+                    "Image Processing: 2D arrays hold RGB pixels of digital images.",
+                    "Buffer Storage: Temporary storage arrays like keyboard buffers or network packets.",
+                    "Look-Up Tables: Static configurations are stored in arrays for fast retrieval."
+                ],
+                advantages: [
+                    "Fast retrieval: Accessing elements at a known index takes O(1) time.",
+                    "Cache Friendly: Contiguous memory storage optimizes CPU cache hits.",
+                    "Minimal memory overhead: No extra pointers or linkage references are stored."
+                ],
+                disadvantages: [
+                    "Fixed Size: The capacity must be determined at compile/allocation time.",
+                    "Expensive inserts/deletes: Shift operations take O(n) time.",
+                    "Contiguous allocation requirements: Finding huge contiguous blocks in heap memory can fail."
+                ],
+                timeComplexity: [
+                    { op: "Access", time: "O(1)" },
+                    { op: "Search", time: "O(n)" },
+                    { op: "Insert (At index / start)", time: "O(n)" },
+                    { op: "Insert (At end)", time: "O(1) amortized" },
+                    { op: "Delete", time: "O(n)" }
+                ],
+                spaceComplexity: "O(n) memory space usage, where n is the capacity of the allocated array.",
+                visualSvg: `
+                    <svg width="320" height="80" viewBox="0 0 320 80">
+                        <rect x="10" y="10" width="60" height="40" fill="#1e293b" stroke="#3b82f6" stroke-width="2" rx="4" />
+                        <text x="40" y="35" fill="white" font-weight="bold" text-anchor="middle">10</text>
+                        <text x="40" y="68" fill="#94a3b8" font-size="12" text-anchor="middle">index 0</text>
+
+                        <rect x="75" y="10" width="60" height="40" fill="#1e293b" stroke="#3b82f6" stroke-width="2" rx="4" />
+                        <text x="105" y="35" fill="white" font-weight="bold" text-anchor="middle">20</text>
+                        <text x="105" y="68" fill="#94a3b8" font-size="12" text-anchor="middle">index 1</text>
+
+                        <rect x="140" y="10" width="60" height="40" fill="#1e293b" stroke="#3b82f6" stroke-width="2" rx="4" />
+                        <text x="170" y="35" fill="white" font-weight="bold" text-anchor="middle">30</text>
+                        <text x="170" y="68" fill="#94a3b8" font-size="12" text-anchor="middle">index 2</text>
+
+                        <rect x="205" y="10" width="60" height="40" fill="#1e293b" stroke="#3b82f6" stroke-width="2" rx="4" />
+                        <text x="235" y="35" fill="white" font-weight="bold" text-anchor="middle">40</text>
+                        <text x="235" y="68" fill="#94a3b8" font-size="12" text-anchor="middle">index 3</text>
+                    </svg>
+                `,
+                tryUrl: "arrays.html"
+            },
+            stack: {
+                title: "Stack",
+                overview: "A Stack is a linear data structure that follows the Last-In, First-Out (LIFO) protocol. All addition (push) and deletion (pop) operations occur strictly at a single point called the 'Top'.",
+                applications: [
+                    "Call Stack: Manages functions executed in programming runtimes.",
+                    "Undo/Redo Actions: Keeps tracks of sequential commands in document editors.",
+                    "Expression Parsing: Infix to Postfix conversions and parsing parentheses.",
+                    "Backtracking algorithms: Finding paths in chess algorithms or maze solvers."
+                ],
+                advantages: [
+                    "Fast execution: Push and Pop run in O(1) constant time.",
+                    "Memory management: Strict control prevents resource leaks during recursive processes."
+                ],
+                disadvantages: [
+                    "No random access: Must pop nodes above to view deeper elements.",
+                    "Overflow Risk: Excessive push triggers a stack overflow exception."
+                ],
+                timeComplexity: [
+                    { op: "Push", time: "O(1)" },
+                    { op: "Pop", time: "O(1)" },
+                    { op: "Peek / Top", time: "O(1)" },
+                    { op: "Search", time: "O(n)" }
+                ],
+                spaceComplexity: "O(n), where n is the number of elements pushed into the stack container.",
+                visualSvg: `
+                    <svg width="200" height="150" viewBox="0 0 200 150">
+                        <line x1="50" y1="20" x2="50" y2="130" stroke="#3b82f6" stroke-width="3"/>
+                        <line x1="130" y1="20" x2="130" y2="130" stroke="#3b82f6" stroke-width="3"/>
+                        <line x1="48" y1="130" x2="132" y2="130" stroke="#3b82f6" stroke-width="3"/>
+
+                        <rect x="58" y="95" width="64" height="28" fill="#1e293b" stroke="#8b5cf6" stroke-width="2" rx="4"/>
+                        <text x="90" y="114" fill="white" font-weight="bold" font-size="12" text-anchor="middle">Bottom: 12</text>
+
+                        <rect x="58" y="60" width="64" height="28" fill="#1e293b" stroke="#8b5cf6" stroke-width="2" rx="4"/>
+                        <text x="90" y="79" fill="white" font-weight="bold" font-size="12" text-anchor="middle">5</text>
+
+                        <rect x="58" y="25" width="64" height="28" fill="#1e293b" stroke="#ef4444" stroke-width="2" rx="4"/>
+                        <text x="90" y="44" fill="white" font-weight="bold" font-size="12" text-anchor="middle">Top: 8</text>
+                    </svg>
+                `,
+                tryUrl: "stack.html"
+            },
+            queue: {
+                title: "Queue",
+                overview: "A Queue is a linear data structure that operates under the First-In, First-Out (FIFO) paradigm. Elements are inserted at the back (Rear) and removed from the front (Front). Circular Queues link the rear back to the front, preventing memory wastage.",
+                applications: [
+                    "Printer Spooling: Holds printer tasks sequentially.",
+                    "CPU Scheduling: Handles operating system process scheduling queues.",
+                    "Call Center Systems: Holds customer calls on hold until support staff answers.",
+                    "Network Buffers: Holds data packets awaiting network transmission."
+                ],
+                advantages: [
+                    "O(1) performance: Enqueue and dequeue operations are constant time.",
+                    "Fair order: Processes elements exactly in their arrival order."
+                ],
+                disadvantages: [
+                    "No random access: Accessing items in the center requires dequeuing leading items.",
+                    "Search overhead: Locating a value requires O(n) sweeps."
+                ],
+                timeComplexity: [
+                    { op: "Enqueue", time: "O(1)" },
+                    { op: "Dequeue", time: "O(1)" },
+                    { op: "Front / Peek", time: "O(1)" },
+                    { op: "Search", time: "O(n)" }
+                ],
+                spaceComplexity: "O(n) where n represents queue slot storage capacity.",
+                visualSvg: `
+                    <svg width="340" height="90" viewBox="0 0 340 90">
+                        <rect x="60" y="20" width="50" height="40" fill="#1e293b" stroke="#3b82f6" stroke-width="2" rx="4"/>
+                        <text x="85" y="45" fill="white" font-weight="bold" text-anchor="middle">15</text>
+                        <text x="85" y="75" fill="#ef4444" font-size="11" font-weight="bold" text-anchor="middle">Front</text>
+
+                        <rect x="120" y="20" width="50" height="40" fill="#1e293b" stroke="#3b82f6" stroke-width="2" rx="4"/>
+                        <text x="145" y="45" fill="white" font-weight="bold" text-anchor="middle">8</text>
+
+                        <rect x="180" y="20" width="50" height="40" fill="#1e293b" stroke="#3b82f6" stroke-width="2" rx="4"/>
+                        <text x="205" y="45" fill="white" font-weight="bold" text-anchor="middle">22</text>
+                        <text x="205" y="75" fill="#10b981" font-size="11" font-weight="bold" text-anchor="middle">Rear</text>
+                    </svg>
+                `,
+                tryUrl: "queue.html"
+            },
+            linkedlist: {
+                title: "Linked Lists",
+                overview: "A Linked List is a linear data structure where nodes are stored non-contiguously in memory. Each node consists of a Data value and reference Pointers pointing to other nodes. This module supports Singly, Doubly, Circular, and Circular Doubly variants.",
+                applications: [
+                    "Dynamic Memory Allocation: Node allocations grow dynamically on the heap without shifting.",
+                    "Web Browser Back/Forward: Doubly linked lists navigate browser history paths.",
+                    "Playlist Queues: Circular lists facilitate looping music playlists.",
+                    "Adjacency lists in Graphs: Linked list arrays store node connections."
+                ],
+                advantages: [
+                    "Dynamic Size: Easily grows and shrinks without reallocation overhead.",
+                    "O(1) Insertions: Node link adjustments take constant time without data shifting."
+                ],
+                disadvantages: [
+                    "Sequential traversal: Accessing nodes requires traversing from the Head (O(n) time).",
+                    "Pointer memory overhead: Storing previous/next pointers consumes extra bytes."
+                ],
+                timeComplexity: [
+                    { op: "Access / Get Index", time: "O(n)" },
+                    { op: "Insert at Beg / End", time: "O(1)" },
+                    { op: "Insert at Position", time: "O(n)" },
+                    { op: "Delete at Beg / End", time: "O(1)" },
+                    { op: "Delete at Position", time: "O(n)" },
+                    { op: "Search Node", time: "O(n)" }
+                ],
+                spaceComplexity: "O(n) space complexity to store n nodes, plus additional pointer overhead.",
+                visualSvg: `
+                    <svg width="340" height="100" viewBox="0 0 340 100">
+                        <rect x="10" y="10" width="50" height="30" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+                        <text x="35" y="30" fill="white" font-weight="bold" text-anchor="middle">10</text>
+                        <rect x="60" y="10" width="20" height="30" fill="#0f172a" stroke="#3b82f6" stroke-width="2"/>
+                        <circle cx="70" cy="25" r="3" fill="#cbd5e1"/>
+                        <text x="45" y="55" fill="#cbd5e1" font-size="11" text-anchor="middle">Head</text>
+
+                        <line x1="80" y1="25" x2="115" y2="25" stroke="#cbd5e1" stroke-width="2" marker-end="url(#arrow_detail)"/>
+
+                        <rect x="120" y="10" width="50" height="30" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+                        <text x="145" y="30" fill="white" font-weight="bold" text-anchor="middle">20</text>
+                        <rect x="170" y="10" width="20" height="30" fill="#0f172a" stroke="#3b82f6" stroke-width="2"/>
+                        <circle cx="180" cy="25" r="3" fill="#cbd5e1"/>
+
+                        <line x1="190" y1="25" x2="225" y2="25" stroke="#cbd5e1" stroke-width="2" />
+
+                        <rect x="230" y="10" width="50" height="30" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+                        <text x="255" y="30" fill="white" font-weight="bold" text-anchor="middle">30</text>
+                        <rect x="280" y="10" width="20" height="30" fill="#0f172a" stroke="#3b82f6" stroke-width="2"/>
+                        <text x="290" y="30" fill="#ef4444" font-size="10" font-weight="bold" text-anchor="middle">Ø</text>
+
+                        <defs>
+                            <marker id="arrow_detail" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+                                <path d="M 0 0 L 10 5 L 0 10 z" fill="#cbd5e1"/>
+                            </marker>
+                        </defs>
+                    </svg>
+                `,
+                tryUrl: "linkedlist.html"
+            },
+            trees: {
+                title: "Trees",
+                overview: "A Tree is a hierarchical data structure. Binary Trees allow parents to have at most two children. Binary Search Trees (BST) place smaller keys left and larger keys right. AVL trees dynamically self-balance using rotations to keep lookup complexity logarithmic. Database systems employ B-Trees and B+ Trees to manage indexes.",
+                applications: [
+                    "Folder Directories: OS file systems map paths using directory trees.",
+                    "HTML DOM: Browser engines compile layout components hierarchically.",
+                    "Database Indexing: B-Trees and B+ Trees optimize file search queries.",
+                    "Syntax Parsers: Compilers interpret statements inside syntax trees."
+                ],
+                advantages: [
+                    "Logarithmic speeds: Searches and insertions run in O(log n) average time.",
+                    "Ordered structures: BST traversals sort records automatically."
+                ],
+                disadvantages: [
+                    "Imbalance overhead: BSTs can degrade to O(n) line layout if unmanaged.",
+                    "Rotation complexity: Self-balancing trees (AVL, RB) require overhead logic."
+                ],
+                timeComplexity: [
+                    { op: "Search (BST Avg / AVL)", time: "O(log n)" },
+                    { op: "Search (BST Worst)", time: "O(n)" },
+                    { op: "Insert (BST Avg / AVL)", time: "O(log n)" },
+                    { op: "Delete (BST Avg / AVL)", time: "O(log n)" }
+                ],
+                spaceComplexity: "O(n) node storage, recursive traversal stack takes O(height) space.",
+                visualSvg: `
+                    <svg width="200" height="120" viewBox="0 0 200 120">
+                        <line x1="100" y1="20" x2="60" y2="70" stroke="#555" stroke-width="2"/>
+                        <line x1="100" y1="20" x2="140" y2="70" stroke="#555" stroke-width="2"/>
+
+                        <circle cx="100" cy="20" r="16" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+                        <text x="100" y="24" fill="white" font-weight="bold" font-size="12" text-anchor="middle">50</text>
+
+                        <circle cx="60" cy="70" r="16" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+                        <text x="60" y="74" fill="white" font-weight="bold" font-size="12" text-anchor="middle">30</text>
+
+                        <circle cx="140" cy="70" r="16" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+                        <text x="140" y="74" fill="white" font-weight="bold" font-size="12" text-anchor="middle">70</text>
+                    </svg>
+                `,
+                tryUrl: "trees.html"
+            },
+            graphs: {
+                title: "Graphs",
+                overview: "A Graph is a non-linear network containing Nodes (Vertices) linked by pathways (Edges). Graphs map directed, undirected, cyclic, acyclic (DAG), and weighted pathways. Searching vertices is performed using Depth-First (DFS) or Breadth-First (BFS) traversals.",
+                applications: [
+                    "GPS Mapping: Road intersections are vertices and routes are weighted edges.",
+                    "Social Networks: Users map as vertices and friendships are connection pathways.",
+                    "Routing tables: Network links map internet packet relays.",
+                    "Dependency graphs: Package managers resolve dependency compilation lists."
+                ],
+                advantages: [
+                    "Flexible modeling: Represents arbitrary, complex network systems.",
+                    "Path-finding: Algorithms identify shortest paths (Dijkstra, A*)."
+                ],
+                disadvantages: [
+                    "High memory use: Adjacency matrices scale exponentially (O(V^2)).",
+                    "Implementation complexity: Cycle checks and weight traversals are mathematically intensive."
+                ],
+                timeComplexity: [
+                    { op: "BFS Traversal", time: "O(V + E)" },
+                    { op: "DFS Traversal", time: "O(V + E)" },
+                    { op: "Add Vertex", time: "O(1) List / O(V^2) Matrix" },
+                    { op: "Add Edge", time: "O(1)" }
+                ],
+                spaceComplexity: "O(V + E) space for Adjacency Lists, or O(V^2) space for Adjacency Matrices.",
+                visualSvg: `
+                    <svg width="220" height="120" viewBox="0 0 220 120">
+                        <defs>
+                            <marker id="arrow_graph" viewBox="0 0 10 10" refX="16" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                                <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b82f6"/>
+                            </marker>
+                        </defs>
+                        <line x1="40" y1="60" x2="110" y2="30" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrow_graph)"/>
+                        <line x1="110" y1="30" x2="180" y2="60" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrow_graph)"/>
+                        <line x1="40" y1="60" x2="180" y2="60" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrow_graph)"/>
+
+                        <circle cx="40" cy="60" r="14" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+                        <text x="40" y="64" fill="white" font-weight="bold" font-size="11" text-anchor="middle">A</text>
+
+                        <circle cx="110" cy="30" r="14" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+                        <text x="110" y="34" fill="white" font-weight="bold" font-size="11" text-anchor="middle">B</text>
+
+                        <circle cx="180" cy="60" r="14" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+                        <text x="180" y="64" fill="white" font-weight="bold" font-size="11" text-anchor="middle">C</text>
+                    </svg>
+                `,
+                tryUrl: "graphs.html"
+            }
+        };
+
+        function showDetail(key) {
+            const data = dsContent[key];
+            if (!data) return;
+
+            const detailView = document.getElementById("detail-view");
+            const dashboard = document.getElementById("dashboard");
+
+            const appsLi = data.applications.map(a => `<li>${a}</li>`).join("");
+            const advLi = data.advantages.map(a => `<li>${a}</li>`).join("");
+            const disLi = data.disadvantages.map(a => `<li>${a}</li>`).join("");
+
+            const tableRows = data.timeComplexity.map(row => `
+                <tr>
+                    <td><b>${row.op}</b></td>
+                    <td><code style="color: #60a5fa; font-weight: bold;">${row.time}</code></td>
+                </tr>
+            `).join("");
+
+            detailView.innerHTML = `
+                <div class="detail-header">
+                    <h1>${data.title} Theory</h1>
+                    <button class="btn-back" onclick="hideDetail()">← Back to Categories</button>
+                </div>
+
+                <div class="detail-section">
+                    <h3>1. Overview</h3>
+                    <p>${data.overview}</p>
+                </div>
+
+                <div class="detail-section">
+                    <h3>2. Real-World Applications</h3>
+                    <ul class="bullets-container">${appsLi}</ul>
+                </div>
+
+                <div class="detail-section">
+                    <h3>3. Advantages & Disadvantages</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; min-width: 0;">
+                        <div>
+                            <h4 style="margin: 0 0 10px 0; color: #10b981;">Advantages</h4>
+                            <ul class="bullets-container">${advLi}</ul>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0 0 10px 0; color: #ef4444;">Disadvantages</h4>
+                            <ul class="bullets-container">${disLi}</ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>4. Time & Space Complexity</h3>
+                    <table class="complexity-table">
+                        <thead>
+                            <tr>
+                                <th>Operation</th>
+                                <th>Complexity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                    </table>
+                    <p style="margin-top: 15px;"><b>Space Complexity:</b> ${data.spaceComplexity}</p>
+                </div>
+
+                <div class="detail-section">
+                    <h3>5. Visual Structure</h3>
+                    <div class="diagram-container">
+                        ${data.visualSvg}
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <a href="${data.tryUrl}" class="btn-try">Try Interactive Visualization →</a>
+                </div>
+            `;
+
+            dashboard.style.display = "none";
+            detailView.style.display = "block";
+
+            // Hide reviews wall and footer when viewing theory
+            const reviewsWall = document.getElementById("reviewsWallSection");
+            const footer = document.getElementById("footerSection");
+            if (reviewsWall) reviewsWall.style.display = "none";
+            if (footer) footer.style.display = "none";
+
+            // Smooth scroll to the top of the learn section container
+            const containerEl = document.querySelector(".learn-container");
+            if (containerEl) {
+                containerEl.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function hideDetail(key) {
+            document.getElementById("detail-view").style.display = "none";
+            document.getElementById("dashboard").style.display = "block";
+
+            // Show reviews wall and footer when returning to dashboard
+            const reviewsWall = document.getElementById("reviewsWallSection");
+            const footer = document.getElementById("footerSection");
+            if (reviewsWall) reviewsWall.style.display = "block";
+            if (footer) footer.style.display = "block";
+
+            const containerEl = document.querySelector(".learn-container");
+            if (containerEl) {
+                containerEl.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // REVIEWS RETRIEVAL AND ADMIN SCRIPTS
+        function toggleAdminMode() {
+            const isAdmin = localStorage.getItem("isAdmin") === "true";
+            if (isAdmin) {
+                localStorage.removeItem("isAdmin");
+                alert("Admin mode disabled.");
+                updateAdminView();
+            } else {
+                const pass = prompt("Enter Admin Passcode:");
+                if (pass === "admin123") {
+                    localStorage.setItem("isAdmin", "true");
+                    alert("Admin mode enabled!");
+                    updateAdminView();
+                } else if (pass !== null) {
+                    alert("Incorrect passcode!");
+                }
+            }
+        }
+
+        function updateAdminView() {
+            const isAdmin = localStorage.getItem("isAdmin") === "true";
+            const badge = document.getElementById("adminBadge");
+            if (badge) {
+                if (isAdmin) {
+                    badge.innerText = "Admin: Enabled (Click to logout)";
+                    badge.style.background = "rgba(16, 185, 129, 0.25)";
+                } else {
+                    badge.innerText = "Admin Mode";
+                    badge.style.background = "rgba(16, 185, 129, 0.15)";
+                }
+            }
+            fetchReviews();
+        }
+
+        let allReviews = [];
+        let currentReviewIndex = 0;
+        let carouselTimer = null;
+        let isHovered = false;
+
+        async function fetchReviews() {
+            try {
+                const res = await fetch("/api/feedbacks");
+                const data = await res.json();
+                renderReviews(data);
+            } catch (err) {
+                console.error("Error fetching reviews:", err);
+            }
+        }
+
+        function renderReviews(reviews) {
+            allReviews = reviews;
+            const container = document.getElementById("reviewsContainer");
+            
+            if (allReviews.length === 0) {
+                container.innerHTML = `<p style="text-align: center; color: #64748b; margin-top: 20px;">No reviews yet. Be the first to review on the Feedback page!</p>`;
+                stopCarousel();
+                return;
+            }
+
+            // Render stack container
+            container.innerHTML = `
+                <div class="reviews-carousel-wrapper">
+                    <div class="review-stack" id="reviewStack">
+                        <!-- Active card will be rendered here -->
+                    </div>
+                </div>
+            `;
+            
+            currentReviewIndex = 0;
+            renderActiveReview();
+            
+            // Add mouse listeners to reviewsContainer for hover pause/resume
+            container.addEventListener("mouseenter", () => {
+                isHovered = true;
+                stopCarousel();
+            });
+            container.addEventListener("mouseleave", () => {
+                isHovered = false;
+                startCarousel();
+            });
+            
+            // Add mouse listeners to the inner wrapper for secondary safety
+            const wrapper = container.querySelector(".reviews-carousel-wrapper");
+            if (wrapper) {
+                wrapper.addEventListener("mouseenter", () => {
+                    isHovered = true;
+                    stopCarousel();
+                });
+                wrapper.addEventListener("mouseleave", () => {
+                    isHovered = false;
+                    startCarousel();
+                });
+            }
+            
+            if (allReviews.length > 1) {
+                startCarousel();
+            } else {
+                stopCarousel();
+            }
+        }
+
+        function renderActiveReview() {
+            const stack = document.getElementById("reviewStack");
+            if (!stack) return;
+            
+            if (allReviews.length === 0) {
+                stack.innerHTML = `<p style="text-align: center; color: #64748b; padding: 20px;">No reviews yet. Be the first to review on the Feedback page!</p>`;
+                stopCarousel();
+                return;
+            }
+            
+            if (currentReviewIndex >= allReviews.length) {
+                currentReviewIndex = 0;
+            }
+            
+            const r = allReviews[currentReviewIndex];
+            if (!r) return;
+            
+            const stars = "★".repeat(r.rating) + "☆".repeat(5 - r.rating);
+
+            stack.innerHTML = `
+                <div class="review-item review-carousel-item" id="activeReviewCard">
+                    <div class="review-card-content" id="activeReviewContent">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <div>
+                                <span class="review-user-name">${escapeHtml(r.name)}</span>
+                                <span class="review-user-email">(${escapeHtml(r.email)})</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <span style="color: #fbbf24; font-size: 1.1rem;">${stars}</span>
+                            </div>
+                        </div>
+                        <p class="review-text">${escapeHtml(r.review)}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkHover() {
+            if (isHovered) return true;
+            const container = document.getElementById("reviewsContainer");
+            if (!container) return false;
+            try {
+                return container.matches(':hover') || 
+                       container.querySelector('.reviews-carousel-wrapper:hover') !== null ||
+                       container.querySelector('.review-item:hover') !== null;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function startCarousel() {
+            if (carouselTimer) clearInterval(carouselTimer);
+            if (checkHover()) return; // Don't start interval if hovered!
+            if (allReviews.length > 1) {
+                carouselTimer = setInterval(nextReview, 4000);
+            }
+        }
+
+        function stopCarousel() {
+            if (carouselTimer) {
+                clearInterval(carouselTimer);
+                carouselTimer = null;
+            }
+        }
+
+        function nextReview() {
+            if (checkHover()) return; // Skip rotation if hovered
+            if (allReviews.length <= 1) return;
+            
+            const content = document.getElementById("activeReviewContent");
+            if (!content) return;
+            
+            // Fade out the inner content container
+            content.classList.add("fade-out");
+            
+            // Swap content after fade-out transition (300ms)
+            setTimeout(() => {
+                // Double check hover state after transition delay
+                if (checkHover()) {
+                    content.classList.remove("fade-out");
+                    return;
+                }
+                currentReviewIndex = (currentReviewIndex + 1) % allReviews.length;
+                renderActiveReview();
+                
+                const newContent = document.getElementById("activeReviewContent");
+                if (newContent) {
+                    newContent.classList.add("fade-in");
+                    // Force reflow to trigger transition
+                    newContent.offsetHeight;
+                    newContent.classList.remove("fade-in");
+                }
+            }, 300);
+        }
+
+
+
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Initialize review loading on homepage
+        document.addEventListener("DOMContentLoaded", () => {
+            updateAdminView();
+        });
+    </script>
+</body>
+
+</html>

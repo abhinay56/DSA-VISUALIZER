@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Linked List Visualization</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 3 3 0 0 1 0-3.88 2.5 2.5 0 0 1 0-3.12A2.5 2.5 0 0 1 9.5 2z'/><path d='M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-3.12 3 3 0 0 0 0-3.88 2.5 2.5 0 0 0 0-3.12A2.5 2.5 0 0 0 14.5 2z'/></svg>">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+<script defer src="linkedlist.js"></script>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+
+<div class="logo">DSA Visualizer</div>
+
+<div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+<ul class="navLinks" id="navLinks">
+<li><a href="index.html">Home</a></li>
+<li><a href="arrays.html">Arrays</a></li>
+<li><a href="stack.html">Stack</a></li>
+<li><a href="queue.html">Queue</a></li>
+<li><a href="linkedlist.html" class="active">Linked List</a></li>
+<li><a href="trees.html">Trees</a></li>
+<li><a href="graphs.html">Graphs</a></li>
+<li><a href="feedback.html">Feedback</a></li>
+</ul>
+
+<button class="themeBtn" onclick="toggleTheme()">
+<span id="themeIcon">⚙️</span>
+</button>
+
+</div>
+
+<!-- CONTAINER -->
+<div class="container">
+
+    <!-- LEFT PANEL: CONTROLS -->
+    <div class="leftPanel" style="overflow-y:auto; max-height:calc(100vh - 70px);">
+        <h2>Linked List Controls</h2>
+
+        <!-- Linked List Type Select -->
+        <div>
+            <label style="font-size:14px;color:#94a3b8;font-weight:bold;">Select Linked List Type</label>
+            <select id="listType" onchange="switchListType(this.value)" style="width:100%; margin-top:5px; background:#1e293b; color:white; border:1px solid #475569; padding:10px; border-radius:6px; outline:none;">
+                <option value="singly">Singly Linked List</option>
+                <option value="doubly">Doubly Linked List</option>
+                <option value="circular">Circular Linked List</option>
+                <option value="circular_doubly">Circular Doubly Linked List</option>
+            </select>
+        </div>
+
+        <hr style="border:0; border-top:1px solid #334155;">
+        
+        <!-- Setup/Initialize -->
+        <div>
+            <label style="font-size:14px;color:#94a3b8;">Custom Initialization (comma-separated)</label>
+            <div style="display:flex; gap:5px; margin-top:5px;">
+                <input type="text" id="customInput" placeholder="e.g. 10, 20, 30" style="flex:1;">
+                <button onclick="setCustomList()">Set</button>
+            </div>
+            <button onclick="createEmptyList()" style="width:100%; margin-top:8px; background:#0ea5e9;">Create Empty List</button>
+        </div>
+
+        <hr style="border:0; border-top:1px solid #334155;">
+
+        <!-- Insertion -->
+        <div>
+            <label style="font-size:14px;color:#94a3b8;font-weight:bold;">Insert Node</label>
+            <div style="display:flex; gap:5px; margin-top:5px;">
+                <input type="number" id="insertValue" placeholder="Value" style="width:50%;">
+                <input type="number" id="insertIndex" placeholder="Index" style="width:50%;">
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:8px;">
+                <button onclick="insertAtBeginning()">At Beginning</button>
+                <button onclick="insertAtEnd()">At End</button>
+            </div>
+            <button onclick="insertAtIndex()" style="width:100%; margin-top:5px; background:#3b82f6;">At Index</button>
+        </div>
+
+        <hr style="border:0; border-top:1px solid #334155;">
+
+        <!-- Deletion -->
+        <div>
+            <label style="font-size:14px;color:#94a3b8;font-weight:bold;">Delete Node</label>
+            <div style="display:flex; gap:5px; margin-top:5px;">
+                <input type="number" id="deleteIndex" placeholder="Index" style="flex:1;">
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:8px;">
+                <button onclick="deleteFromBeginning()" class="reset">From Beg</button>
+                <button onclick="deleteFromEnd()" class="reset">From End</button>
+            </div>
+            <button onclick="deleteAtIndex()" class="reset" style="width:100%; margin-top:5px;">At Index</button>
+        </div>
+
+        <hr style="border:0; border-top:1px solid #334155;">
+
+        <!-- Search & Update -->
+        <div>
+            <label style="font-size:14px;color:#94a3b8;font-weight:bold;">Search & Update</label>
+            <div style="display:flex; gap:5px; margin-top:5px;">
+                <input type="number" id="opValue" placeholder="Value" style="width:50%;">
+                <input type="number" id="opIndex" placeholder="Index" style="width:50%;">
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:8px;">
+                <button onclick="searchList()" style="background:#10b981;">Search</button>
+                <button onclick="updateNode()" style="background:#8b5cf6;">Update Node</button>
+            </div>
+        </div>
+
+        <hr style="border:0; border-top:1px solid #334155;">
+
+        <!-- Traverse & Reverse -->
+        <div>
+            <label style="font-size:14px;color:#94a3b8;font-weight:bold;">Traverse & Reverse</label>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:8px;" id="traversal-container">
+                <button onclick="traverseList()" style="background:#8b5cf6;" id="traverseBtn">Traverse</button>
+                <button onclick="traverseBackward()" style="background:#8b5cf6; display:none;" id="traverseBackBtn">Traverse Back</button>
+                <button onclick="reverseList()" style="background:#a855f7;" id="reverseBtn">Reverse</button>
+            </div>
+            <button onclick="clearList()" class="reset" style="width:100%; margin-top:8px;">Clear List</button>
+        </div>
+
+        <hr style="border:0; border-top:1px solid #334155;">
+
+        <!-- Animation Controls -->
+        <div>
+            <label style="font-size:14px;color:#94a3b8;font-weight:bold;">Animation Settings</label>
+            <div class="speed-control">
+                <label for="speedSlider">Speed: <span id="speedVal">1.0</span>s/step</label>
+                <input type="range" id="speedSlider" min="200" max="2500" value="1000" oninput="changeSpeed(this.value)">
+            </div>
+            <div class="playback-controls">
+                <button id="playBtn" onclick="togglePlay()" class="active-btn">Pause</button>
+                <button onclick="stepPrev()">&lt; Step</button>
+                <button onclick="stepNext()">Step &gt;</button>
+            </div>
+            <button onclick="resetAnimation()" class="reset" style="width:100%; margin-top:8px;">Reset</button>
+        </div>
+
+    </div>
+
+    <!-- MIDDLE PANEL: STAGE -->
+    <div class="middlePanel">
+        <div class="ll-stage">
+            <div id="ll-container" class="ll-container">
+                <!-- Linked list nodes will be generated dynamically -->
+            </div>
+            <div id="message" style="margin-top:15px; padding:10px 20px; background:#1e293b; color:#22c55e; border-radius:8px; font-weight:bold; min-height:40px; text-align:center;">Linked List Ready</div>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL: EXPLANATION -->
+    <div class="explanationPanel">
+        <h2>Explanation</h2>
+        <div class="explanation-content">
+            <div class="explanation-item">
+                <span class="explanation-label">Operation</span>
+                <span id="exp-operation" class="explanation-value">-</span>
+            </div>
+            <div class="explanation-item" id="exp-val-container" style="display:none;">
+                <span id="exp-val-label" class="explanation-label">Value</span>
+                <span id="exp-val-value" class="explanation-value">-</span>
+            </div>
+            <div class="explanation-item">
+                <span class="explanation-label">Description</span>
+                <div id="explanation" class="explanation-desc">Create or enter elements to start visualizing.</div>
+            </div>
+            <div class="explanation-item" id="exp-extra-container" style="display:none;"></div>
+            <div class="explanation-item">
+                <span class="explanation-label">Time Complexity</span>
+                <span id="exp-time" class="explanation-value">-</span>
+            </div>
+            <div class="explanation-item">
+                <span class="explanation-label">Space Complexity</span>
+                <span id="exp-space" class="explanation-value">-</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

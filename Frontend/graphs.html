@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Graph Visualization</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 3 3 0 0 1 0-3.88 2.5 2.5 0 0 1 0-3.12A2.5 2.5 0 0 1 9.5 2z'/><path d='M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-3.12 3 3 0 0 0 0-3.88 2.5 2.5 0 0 0 0-3.12A2.5 2.5 0 0 0 14.5 2z'/></svg>">
+<link rel="stylesheet" href="style.css">
+<!-- D3.JS FOR FORCE GRAPH -->
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="theme.js"></script>
+<script defer src="graphs.js"></script>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+
+<div class="logo">DSA Visualizer</div>
+
+<div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+<ul class="navLinks" id="navLinks">
+<li><a href="index.html">Home</a></li>
+<li><a href="arrays.html">Arrays</a></li>
+<li><a href="stack.html">Stack</a></li>
+<li><a href="queue.html">Queue</a></li>
+<li><a href="linkedlist.html">Linked List</a></li>
+<li><a href="trees.html">Trees</a></li>
+<li><a href="graphs.html" class="active">Graphs</a></li>
+<li><a href="feedback.html">Feedback</a></li>
+</ul>
+
+<button class="themeBtn" onclick="toggleTheme()">
+<span id="themeIcon">⚙️</span>
+</button>
+
+</div>
+
+<!-- CONTAINER -->
+<div class="container">
+
+    <!-- LEFT PANEL: CONTROLS -->
+    <div class="leftPanel" style="overflow-y:auto; max-height:calc(100vh - 70px); width:28%; padding:20px 15px; gap:12px;">
+        <h2>Graph Controls</h2>
+        
+        <!-- Interactive info -->
+        <p style="font-size:12px; color:#94a3b8; line-height:1.3; background: #0f172a; padding: 8px; border-radius: 6px;">
+            🖱️ <b>Interact:</b><br/>
+            - Double click empty canvas to Add Node.<br/>
+            - Click Node/Edge to select. Drag to reposition.<br/>
+            - Click 'Remove Selected' to delete selected element.
+        </p>
+
+        <!-- Node/Edge Settings -->
+        <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; justify-content:space-between; gap:5px;">
+                <button id="removeSelectedBtn" onclick="removeSelectedElement()" class="reset" style="flex:1; padding:6px 10px; font-size:12px;">Remove Selected</button>
+                <button onclick="clearGraph()" class="reset" style="flex:1; padding:6px 10px; font-size:12px;">Clear Graph</button>
+            </div>
+            <button onclick="generateSampleGraph()" style="background:#0ea5e9; padding:8px; font-size:13px; font-weight:bold;">Generate Sample Graph</button>
+        </div>
+
+        <hr style="border:0; border-top:1px solid #334155;">
+
+        <!-- Graph Configs -->
+        <div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;">
+                <div>
+                    <label style="font-size:12px;color:#94a3b8;">Topology</label>
+                    <select id="directedSelect" onchange="toggleDirected(this.value)" style="width:100%; margin-top:3px; padding:6px; background:#1e293b; color:white; border:1px solid #475569; font-size:12px;">
+                        <option value="undirected">Undirected</option>
+                        <option value="directed">Directed</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:12px;color:#94a3b8;">Weights</label>
+                    <select id="weightedSelect" onchange="toggleWeighted(this.value)" style="width:100%; margin-top:3px; padding:6px; background:#1e293b; color:white; border:1px solid #475569; font-size:12px;">
+                        <option value="unweighted">Unweighted</option>
+                        <option value="weighted">Weighted</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Link Nodes Builder -->
+            <div style="margin-top:8px;">
+                <label style="font-size:12px;color:#94a3b8;">Add/Edit Edge (weight & nodes)</label>
+                <div style="display:flex; gap:3px; margin-top:3px; align-items:center;">
+                    <select id="edgeSource" style="flex:1; padding:6px; background:#1e293b; color:white; border:1px solid #475569; font-size:12px;"></select>
+                    <span style="font-size:12px;">→</span>
+                    <select id="edgeTarget" style="flex:1; padding:6px; background:#1e293b; color:white; border:1px solid #475569; font-size:12px;"></select>
+                    <input type="number" id="edgeWeightInput" placeholder="Wt" style="width:45px; padding:6px; font-size:12px;" value="1">
+                    <button onclick="addEdgeManually()" style="padding:6px; font-size:12px;">Add</button>
+                </div>
+            </div>
+        </div>
+
+        <hr style="border:0; border-top:1px solid #334155;">
+
+        <!-- Algorithms -->
+        <div>
+            <label style="font-size:13px;color:#94a3b8;font-weight:bold;">Algorithms</label>
+            
+            <div style="display:flex; gap:3px; margin-top:4px; align-items:center;">
+                <label style="font-size:11px; color:#cbd5e1;">Start:</label>
+                <select id="algoStartNode" style="flex:1; padding:4px; background:#1e293b; color:white; border:1px solid #475569; font-size:11px;"></select>
+                <label style="font-size:11px; color:#cbd5e1;">End:</label>
+                <select id="algoEndNode" style="flex:1; padding:4px; background:#1e293b; color:white; border:1px solid #475569; font-size:11px;"></select>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:8px;">
+                <button onclick="runBFS()" style="background:#8b5cf6; padding:6px 2px; font-size:12px;">Run BFS</button>
+                <button onclick="runDFS()" style="background:#8b5cf6; padding:6px 2px; font-size:12px;">Run DFS</button>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:5px;">
+                <button onclick="runDijkstra()" style="background:#10b981; padding:6px 2px; font-size:11px; font-weight:bold;">Dijkstra Path</button>
+                <button onclick="runPrim()" style="background:#10b981; padding:6px 2px; font-size:11px; font-weight:bold;">Prim's MST</button>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:5px;">
+                <button onclick="runKruskal()" style="background:#fbbf24; color:black; padding:6px 2px; font-size:11px; font-weight:bold;">Kruskal MST</button>
+                <button onclick="runTopSort()" style="background:#fbbf24; color:black; padding:6px 2px; font-size:11px; font-weight:bold;">Topological</button>
+            </div>
+            <button onclick="runCycleDetection()" style="width:100%; margin-top:5px; background:#ef4444; padding:6px; font-size:12px;">Cycle Detection</button>
+        </div>
+
+        <hr style="border:0; border-top:1px solid #334155;">
+
+        <!-- Animation Controls -->
+        <div>
+            <div class="speed-control" style="margin-top:0;">
+                <label for="speedSlider" style="font-size:12px;">Speed: <span id="speedVal">1.0</span>s/step</label>
+                <input type="range" id="speedSlider" min="200" max="2500" value="1000" oninput="changeSpeed(this.value)" style="margin-top:2px;">
+            </div>
+            <div class="playback-controls" style="margin-top:5px;">
+                <button id="playBtn" onclick="togglePlay()" class="active-btn">Pause</button>
+                <button onclick="stepPrev()">&lt; Step</button>
+                <button onclick="stepNext()">Step &gt;</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- RIGHT PANEL: STAGE -->
+    <div class="rightPanel" style="width:72%; flex-direction:column; justify-content:space-between; padding:15px; gap:10px;">
+        
+        <div class="graph-stage">
+            <!-- CANVAS -->
+            <div class="graph-canvas-container">
+                <svg id="graphSvg" class="graph-canvas"></svg>
+            </div>
+
+            <!-- QUEUE / STACK DISPLAY -->
+            <div id="graph-ds-container" class="graph-ds-container">
+                <span class="graph-ds-title" id="dsTitle">Queue:</span>
+                <div id="graph-ds-content" class="graph-ds-content">
+                    <!-- Queue/Stack elements will be drawn dynamically -->
+                </div>
+            </div>
+
+            <!-- EXPLANATION PANEL -->
+            <div id="explanation" class="explanation-panel">
+                Add vertices/edges, select an algorithm on the left, and click to visualize. Double click the dark background to place nodes.
+            </div>
+
+            <!-- ADJACENCY STRUCTURES -->
+            <div class="adj-container">
+                <div class="adj-box">
+                    <h3>Adjacency List</h3>
+                    <div id="adjList" class="adj-list">Empty graph.</div>
+                </div>
+                <div class="adj-box">
+                    <h3>Adjacency Matrix</h3>
+                    <div id="adjMatrix" style="overflow-x:auto;">
+                        <table class="adj-matrix-table" id="matrixTable">
+                            <tbody><tr><td>-</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

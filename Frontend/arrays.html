@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Array Visualization</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 3 3 0 0 1 0-3.88 2.5 2.5 0 0 1 0-3.12A2.5 2.5 0 0 1 9.5 2z'/><path d='M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-3.12 3 3 0 0 0 0-3.88 2.5 2.5 0 0 0 0-3.12A2.5 2.5 0 0 0 14.5 2z'/></svg>">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+<script defer src="arrays.js"></script>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+
+<div class="logo">DSA Visualizer</div>
+
+<div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+<ul class="navLinks" id="navLinks">
+<li><a href="index.html">Home</a></li>
+<li><a href="arrays.html" class="active">Arrays</a></li>
+<li><a href="stack.html">Stack</a></li>
+<li><a href="queue.html">Queue</a></li>
+<li><a href="linkedlist.html">Linked List</a></li>
+<li><a href="trees.html">Trees</a></li>
+<li><a href="graphs.html">Graphs</a></li>
+<li><a href="feedback.html">Feedback</a></li>
+</ul>
+
+<button class="themeBtn" onclick="toggleTheme()">
+<span id="themeIcon">⚙️</span>
+</button>
+
+</div>
+
+<!-- CONTAINER -->
+<div class="container">
+
+    <!-- LEFT PANEL: CONTROLS -->
+    <div class="leftPanel" style="overflow-y:auto; max-height:calc(100vh - 70px);">
+        <h2>Array Control Panel</h2>
+        
+        <!-- Input & Custom Initializer -->
+        <div>
+            <label style="font-size:14px;color:#94a3b8;">Custom Array (comma-separated)</label>
+            <div style="display:flex; gap:5px; margin-top:5px;">
+                <input type="text" id="customInput" placeholder="e.g. 12, 5, 8, 20, 1" style="flex:1;">
+                <button onclick="setCustomArray()">Set</button>
+            </div>
+            <button onclick="generateRandomArray()" style="width:100%; margin-top:8px; background:#0ea5e9;">Generate Random Array</button>
+        </div>
+
+        <hr style="border:0; border-top:1px solid #334155;">
+
+        <!-- Operations: CRUD -->
+        <div>
+            <label style="font-size:14px;color:#94a3b8;font-weight:bold;">Insert / Delete / Update</label>
+            <div style="display:flex; gap:5px; margin-top:5px;">
+                <input type="number" id="opValue" placeholder="Value" style="width:50%;">
+                <input type="number" id="opIndex" placeholder="Index" style="width:50%;">
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:8px;">
+                <button onclick="insertElement()">Insert</button>
+                <button onclick="updateElement()">Update</button>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:5px;">
+                <button onclick="deleteByIndex()" class="reset" style="padding:8px 5px;">Del Index</button>
+                <button onclick="deleteByValue()" class="reset" style="padding:8px 5px;">Del Value</button>
+            </div>
+        </div>
+
+        <hr style="border:0; border-top:1px solid #334155;">
+
+        <!-- Operations: Search & Traverse -->
+        <div>
+            <label style="font-size:14px;color:#94a3b8;font-weight:bold;">Search & Traverse</label>
+            <div style="display:flex; gap:5px; margin-top:5px;">
+                <input type="number" id="searchValue" placeholder="Search Value" style="flex:1;">
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:8px;">
+                <button onclick="linearSearch()" style="background:#10b981;">Linear Search</button>
+                <button onclick="binarySearch()" style="background:#10b981;">Binary Search</button>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:5px;">
+                <button onclick="traverseArray()" style="background:#8b5cf6;">Traverse</button>
+                <button onclick="reverseArray()" style="background:#8b5cf6;">Reverse</button>
+            </div>
+        </div>
+
+        <hr style="border:0; border-top:1px solid #334155;">
+
+        <!-- Operations: Sorting -->
+        <div>
+            <label style="font-size:14px;color:#94a3b8;font-weight:bold;">Sorting Algorithms</label>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:8px;">
+                <button onclick="bubbleSort()" style="background:#a855f7; padding:8px 5px;">Bubble</button>
+                <button onclick="selectionSort()" style="background:#a855f7; padding:8px 5px;">Selection</button>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; margin-top:5px;">
+                <button onclick="insertionSort()" style="background:#a855f7; padding:8px 2px; font-size:12px;">Insertion</button>
+                <button onclick="mergeSort()" style="background:#a855f7; padding:8px 2px; font-size:12px;">Merge</button>
+                <button onclick="quickSort()" style="background:#a855f7; padding:8px 2px; font-size:12px;">Quick</button>
+            </div>
+        </div>
+
+        <hr style="border:0; border-top:1px solid #334155;">
+
+        <!-- Animation Controls -->
+        <div>
+            <label style="font-size:14px;color:#94a3b8;font-weight:bold;">Animation Settings</label>
+            <div class="speed-control">
+                <label for="speedSlider">Speed: <span id="speedVal">1.0</span>s/step</label>
+                <input type="range" id="speedSlider" min="200" max="2500" value="1000" oninput="changeSpeed(this.value)">
+            </div>
+            <div class="playback-controls">
+                <button id="playBtn" onclick="togglePlay()" class="active-btn">Pause</button>
+                <button onclick="stepPrev()">&lt; Step</button>
+                <button onclick="stepNext()">Step &gt;</button>
+            </div>
+            <button onclick="resetAnimation()" class="reset" style="width:100%; margin-top:8px;">Reset</button>
+        </div>
+
+    </div>
+
+    <!-- MIDDLE PANEL: STAGE -->
+    <div class="middlePanel">
+        <div class="array-stage">
+            <div id="array-container" class="array-container">
+                <!-- Elements will be generated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL: EXPLANATION -->
+    <div class="explanationPanel">
+        <h2>Explanation</h2>
+        <div class="explanation-content">
+            <div class="explanation-item">
+                <span class="explanation-label">Operation</span>
+                <span id="exp-operation" class="explanation-value">-</span>
+            </div>
+            <div class="explanation-item" id="exp-val-container" style="display:none;">
+                <span id="exp-val-label" class="explanation-label">Value</span>
+                <span id="exp-val-value" class="explanation-value">-</span>
+            </div>
+            <div class="explanation-item">
+                <span class="explanation-label">Description</span>
+                <div id="explanation" class="explanation-desc">Generate or enter an array to start visualizing.</div>
+            </div>
+            <div class="explanation-item" id="exp-extra-container" style="display:none;"></div>
+            <div class="explanation-item">
+                <span class="explanation-label">Time Complexity</span>
+                <span id="exp-time" class="explanation-value">-</span>
+            </div>
+            <div class="explanation-item">
+                <span class="explanation-label">Space Complexity</span>
+                <span id="exp-space" class="explanation-value">-</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Stack Visualization</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 3 3 0 0 1 0-3.88 2.5 2.5 0 0 1 0-3.12A2.5 2.5 0 0 1 9.5 2z'/><path d='M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-3.12 3 3 0 0 0 0-3.88 2.5 2.5 0 0 0 0-3.12A2.5 2.5 0 0 0 14.5 2z'/></svg>">
+<link rel="stylesheet" href="style.css">
+<script defer src="stack.js"></script>
+<script src="theme.js"></script>
+</head>
+
+<body>
+
+<div class="navbar">
+<div class="logo">DSA Visualizer</div>
+
+<div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+<ul class="navLinks" id="navLinks">
+<li><a href="index.html">Home</a></li>
+<li><a href="arrays.html">Arrays</a></li>
+<li><a href="stack.html" class="active">Stack</a></li>
+<li><a href="queue.html">Queue</a></li>
+<li><a href="linkedlist.html">Linked List</a></li>
+<li><a href="trees.html">Trees</a></li>
+<li><a href="graphs.html">Graphs</a></li>
+<li><a href="feedback.html">Feedback</a></li>
+</ul>
+
+<button class="themeBtn" onclick="toggleTheme()">
+<span id="themeIcon">⚙️</span>
+</button>
+</div>
+
+<!-- CONTAINER -->
+<div class="container">
+
+    <!-- LEFT PANEL: CONTROLS -->
+    <div class="leftPanel">
+        <h2>Stack Control Panel</h2>
+        
+        <div class="info" style="font-size: 14px; gap: 8px;">
+            <p>Top of Stack :- <span id="top" style="background:#22c55e; padding:2px 8px; border-radius:4px; font-weight:bold;">-</span></p>
+            <p>Size of Stack :- <span id="size" style="background:#22c55e; padding:2px 8px; border-radius:4px; font-weight:bold;">0</span></p>
+        </div>
+
+        <hr style="border:0; border-top:1px solid #334155;">
+
+        <div>
+            <label style="font-size:14px;color:#94a3b8;font-weight:bold;">Operations</label>
+            <input type="text" id="value" placeholder="Enter element" style="width:100%; margin-top:5px; background:#1e293b; color:white; border:1px solid #475569;">
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; margin-top:8px;">
+                <button onclick="push()">Push</button>
+                <button onclick="pop()">Pop</button>
+                <button onclick="peek()">Peek</button>
+            </div>
+            <button class="reset" onclick="resetStack()" style="width:100%; margin-top:8px;">Reset Stack</button>
+        </div>
+    </div>
+
+    <!-- MIDDLE PANEL: VISUALIZATION -->
+    <div class="middlePanel">
+        <div style="display:flex; flex-direction:column; align-items:center;">
+            <div class="stack-box" id="stack"></div>
+            <p class="stack-label" style="margin-top:10px; font-weight:bold;">Stack</p>
+            <div id="message" style="margin-top:15px; padding:10px 20px; background:#1e293b; color:#22c55e; border-radius:8px; font-weight:bold; min-height:40px; text-align:center;">Stack Ready</div>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL: EXPLANATION -->
+    <div class="explanationPanel">
+        <h2>Explanation</h2>
+        <div class="explanation-content">
+            <div class="explanation-item">
+                <span class="explanation-label">Operation</span>
+                <span id="exp-operation" class="explanation-value">-</span>
+            </div>
+            <div class="explanation-item" id="exp-val-container" style="display:none;">
+                <span id="exp-val-label" class="explanation-label">Value</span>
+                <span id="exp-val-value" class="explanation-value">-</span>
+            </div>
+            <div class="explanation-item">
+                <span class="explanation-label">Description</span>
+                <div id="explanation" class="explanation-desc">Push or Pop elements to start visualizing.</div>
+            </div>
+            <div class="explanation-item" id="exp-extra-container" style="display:none;"></div>
+            <div class="explanation-item">
+                <span class="explanation-label">Time Complexity</span>
+                <span id="exp-time" class="explanation-value">-</span>
+            </div>
+            <div class="explanation-item">
+                <span class="explanation-label">Space Complexity</span>
+                <span id="exp-space" class="explanation-value">-</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

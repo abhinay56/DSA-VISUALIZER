@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Tree Visualization</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 3 3 0 0 1 0-3.88 2.5 2.5 0 0 1 0-3.12A2.5 2.5 0 0 1 9.5 2z'/><path d='M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-3.12 3 3 0 0 0 0-3.88 2.5 2.5 0 0 0 0-3.12A2.5 2.5 0 0 0 14.5 2z'/></svg>">
+<link rel="stylesheet" href="style.css">
+<script src="theme.js"></script>
+<script src="trees.js"></script>
+</head>
+
+<body>
+
+<div class="navbar">
+
+<div class="logo">DSA Visualizer</div>
+
+<div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+<ul class="navLinks" id="navLinks">
+<li><a href="index.html">Home</a></li>
+<li><a href="arrays.html">Arrays</a></li>
+<li><a href="stack.html">Stack</a></li>
+<li><a href="queue.html">Queue</a></li>
+<li><a href="linkedlist.html">Linked List</a></li>
+<li><a href="trees.html" class="active">Trees</a></li>
+<li><a href="graphs.html">Graphs</a></li>
+<li><a href="feedback.html">Feedback</a></li>
+</ul>
+
+<button class="themeBtn" onclick="toggleTheme()">
+<span id="themeIcon">⚙️</span>
+</button>
+
+</div>
+
+<div class="container">
+
+<div class="leftPanel">
+
+<h2>Tree Visualization</h2>
+
+<label>Select Tree Type</label>
+
+<select id="treeType">
+<option value="binary">Binary Tree</option>
+<option value="bst">Binary Search Tree</option>
+<option value="avl">AVL Tree</option>
+<option value="rb">Red Black Tree</option>
+<option value="btree">B Tree</option>
+<option value="bplus">B+ Tree</option>
+</select>
+
+<input id="value" placeholder="Enter number" onkeypress="enterInsert(event)">
+
+<button onclick="insertNode()">Insert</button>
+<button onclick="deleteNode()">Delete</button>
+<button onclick="searchNode()">Search</button>
+<button onclick="resetTree()">Reset</button>
+
+<p id="message" style="margin-top:15px;font-weight:bold;"></p>
+
+</div>
+
+<div class="middlePanel">
+<svg id="treeCanvas"></svg>
+</div>
+
+<!-- RIGHT PANEL: EXPLANATION -->
+<div class="explanationPanel">
+    <h2>Explanation</h2>
+    <div class="explanation-content">
+        <div class="explanation-item">
+            <span class="explanation-label">Operation</span>
+            <span id="exp-operation" class="explanation-value">-</span>
+        </div>
+        <div class="explanation-item" id="exp-val-container" style="display:none;">
+            <span id="exp-val-label" class="explanation-label">Value</span>
+            <span id="exp-val-value" class="explanation-value">-</span>
+        </div>
+        <div class="explanation-item">
+            <span class="explanation-label">Description</span>
+            <div id="explanation" class="explanation-desc">Select tree type and insert nodes to start visualizing.</div>
+        </div>
+        <div class="explanation-item" id="exp-extra-container" style="display:none;"></div>
+        <div class="explanation-item">
+            <span class="explanation-label">Time Complexity</span>
+            <span id="exp-time" class="explanation-value">-</span>
+        </div>
+        <div class="explanation-item">
+            <span class="explanation-label">Space Complexity</span>
+            <span id="exp-space" class="explanation-value">-</span>
+        </div>
+    </div>
+</div>
+
+</div>
+
+</body>
+</html>
