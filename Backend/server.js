@@ -13,26 +13,34 @@ app.use(express.static(path.join(__dirname, "../Frontend")));
 
 const FEEDBACKS_FILE = path.join(__dirname, "feedbacks.json");
 
+let feedbacksCache = null;
+
 // Helper to read feedbacks
 function readFeedbacks() {
+    if (feedbacksCache !== null) {
+        return feedbacksCache;
+    }
     try {
-        if (!fs.existsSync(FEEDBACKS_FILE)) {
-            fs.writeFileSync(FEEDBACKS_FILE, JSON.stringify([]));
+        if (fs.existsSync(FEEDBACKS_FILE)) {
+            const data = fs.readFileSync(FEEDBACKS_FILE, "utf8");
+            feedbacksCache = JSON.parse(data);
+        } else {
+            feedbacksCache = [];
         }
-        const data = fs.readFileSync(FEEDBACKS_FILE, "utf8");
-        return JSON.parse(data);
     } catch (err) {
         console.error("Error reading feedbacks file:", err);
-        return [];
+        feedbacksCache = [];
     }
+    return feedbacksCache;
 }
 
 // Helper to write feedbacks
 function writeFeedbacks(feedbacks) {
+    feedbacksCache = feedbacks;
     try {
         fs.writeFileSync(FEEDBACKS_FILE, JSON.stringify(feedbacks, null, 2));
     } catch (err) {
-        console.error("Error writing feedbacks file:", err);
+        console.error("Error writing feedbacks file (using in-memory fallback):", err);
     }
 }
 
@@ -191,7 +199,11 @@ app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "../Frontend/index.html"));
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    console.log(`Open http://localhost:${PORT}/index.html in your browser`);
-});
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+        console.log(`Open http://localhost:${PORT}/index.html in your browser`);
+    });
+}
+
+module.exports = app;
