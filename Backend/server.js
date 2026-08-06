@@ -115,9 +115,12 @@ app.post("/api/send-otp", async (req, res) => {
         }
         res.json({ success: true, message: "OTP sent successfully" });
     } catch (error) {
-        console.error("[OTP Verification] Error sending email:", error);
-        // Fallback for local testing if nodemailer fails/offline
-        res.json({ success: true, message: "OTP generated (see server console log for local testing)" });
+        console.error("EMAIL ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            error: error.message
+        });
     }
 });
 
