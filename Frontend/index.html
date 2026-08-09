@@ -467,51 +467,118 @@
         }
 
         .review-card-content.fade-in {
-            opacity: 0;
-            transform: translateY(10px);
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        /* Floating Settings Theme Button - Minimalist gear icon styling */
-        .floating-theme-btn {
-            position: fixed;
-            top: 25px;
-            right: 25px;
-            z-index: 2000;
-            background: transparent;
+        /* 3 dots menu styles */
+        .review-menu-container {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 10;
+        }
+
+        .review-menu-btn {
+            background: none;
             border: none;
             color: #94a3b8;
-            width: 36px;
-            height: 36px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0 8px;
+            line-height: 1;
+            border-radius: 50%;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            width: 32px;
+            height: 32px;
+        }
+
+        .review-menu-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .light-mode .review-menu-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: #1e293b;
+        }
+
+        .review-dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 35px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+            min-width: 130px;
+            overflow: hidden;
+            z-index: 20;
+        }
+
+        .light-mode .review-dropdown-menu {
+            background: #ffffff;
+            border-color: #cbd5e1;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        }
+
+        .review-dropdown-item {
+            width: 100%;
+            padding: 10px 16px;
+            background: none;
+            border: none;
+            text-align: left;
+            font-size: 0.9rem;
+            color: #cbd5e1;
             cursor: pointer;
-            transition: all 0.3s ease;
-            opacity: 0.75;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
         }
 
-        .floating-theme-btn:hover {
-            transform: rotate(90deg) scale(1.1);
-            color: #ffffff;
-            opacity: 1;
+        .light-mode .review-dropdown-item {
+            color: #334155;
         }
 
-        .light-mode .floating-theme-btn {
-            color: #475569;
+        .review-dropdown-item:hover {
+            background: #334155;
+            color: white;
         }
 
-        .light-mode .floating-theme-btn:hover {
+        .light-mode .review-dropdown-item:hover {
+            background: #f1f5f9;
             color: #0f172a;
+        }
+
+        .review-dropdown-item.delete-item {
+            color: #f87171;
+        }
+
+        .review-dropdown-item.delete-item:hover {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+        }
+
+        /* Hidden review item styling for admin */
+        .review-item.review-hidden {
+            opacity: 0.6;
+            border-style: dashed;
         }
     </style>
 </head>
 
-<body>
+<body class="home-page">
 
-    <!-- FLOATING SETTINGS / THEME SWITCHER -->
-    <button class="themeBtn floating-theme-btn" onclick="toggleTheme()" aria-label="Toggle Theme">
-        <span id="themeIcon">⚙️</span>
+    <!-- FLOATING THEME TOGGLE -->
+    <button class="nav-icon-btn theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle Theme">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon sun-icon"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon moon-icon"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon zap-icon"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
     </button>
 
     <!-- HERO -->
@@ -520,7 +587,6 @@
         <p>Learn algorithms visually like <b>VisuAlgo</b></p>
     </section>
 
-    <!-- FEATURES -->
     <section class="features">
         <a href="arrays.html" class="card">Arrays</a>
         <a href="stack.html" class="card">Stack</a>
@@ -633,8 +699,10 @@
     <!-- REVIEWS WALL -->
     <div id="reviewsWallSection" class="learn-container" style="margin-top: 80px;">
         <h2
-            style="font-size: 2rem; margin-bottom: 25px; border-bottom: 1px solid; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-            <span>User Reviews & Ratings</span>
+            style="font-size: 2rem; margin-bottom: 25px; border-bottom: 1px solid; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <span style="display: flex; align-items: center; gap: 10px;">
+                User Reviews & Ratings
+            </span>
             <a href="feedback.html"
                 style="background: linear-gradient(135deg, #2563eb, #7c3aed); color: white; text-decoration: none; font-size: 0.9rem; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2); transition: all 0.3s;"
                 class="btn-give-feedback">Give Feedback →</a>
@@ -1166,39 +1234,7 @@
             }
         }
 
-        // REVIEWS RETRIEVAL AND ADMIN SCRIPTS
-        function toggleAdminMode() {
-            const isAdmin = localStorage.getItem("isAdmin") === "true";
-            if (isAdmin) {
-                localStorage.removeItem("isAdmin");
-                alert("Admin mode disabled.");
-                updateAdminView();
-            } else {
-                const pass = prompt("Enter Admin Passcode:");
-                if (pass === "admin123") {
-                    localStorage.setItem("isAdmin", "true");
-                    alert("Admin mode enabled!");
-                    updateAdminView();
-                } else if (pass !== null) {
-                    alert("Incorrect passcode!");
-                }
-            }
-        }
-
-        function updateAdminView() {
-            const isAdmin = localStorage.getItem("isAdmin") === "true";
-            const badge = document.getElementById("adminBadge");
-            if (badge) {
-                if (isAdmin) {
-                    badge.innerText = "Admin: Enabled (Click to logout)";
-                    badge.style.background = "rgba(16, 185, 129, 0.25)";
-                } else {
-                    badge.innerText = "Admin Mode";
-                    badge.style.background = "rgba(16, 185, 129, 0.15)";
-                }
-            }
-            fetchReviews();
-        }
+        // REVIEWS RETRIEVAL SCRIPTS
 
         let allReviews = [];
         let currentReviewIndex = 0;
@@ -1292,9 +1328,8 @@
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                             <div>
                                 <span class="review-user-name">${escapeHtml(r.name)}</span>
-                                <span class="review-user-email">(${escapeHtml(r.email)})</span>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
                                 <span style="color: #fbbf24; font-size: 1.1rem;">${stars}</span>
                             </div>
                         </div>
@@ -1362,8 +1397,6 @@
             }, 300);
         }
 
-
-
         function escapeHtml(str) {
             return str
                 .replace(/&/g, "&amp;")
@@ -1375,7 +1408,13 @@
 
         // Initialize review loading on homepage
         document.addEventListener("DOMContentLoaded", () => {
-            updateAdminView();
+            fetchReviews();
+        });
+
+        window.addEventListener("storage", (e) => {
+            if (e.key === "reviews_updated") {
+                fetchReviews();
+            }
         });
     </script>
 </body>
