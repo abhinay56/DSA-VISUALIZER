@@ -185,6 +185,39 @@ function switchQueueType(type) {
 // Draw state of queue
 function renderQueueState(qArr, f, r, sz, highlights = {}) {
     const container = document.getElementById("queue-container");
+
+    const expectedClass = queueType === "circular" ? "queue-container circular" : "queue-container";
+    const currentSlots = container.querySelectorAll(".queue-slot");
+
+    if (container.className === expectedClass && currentSlots.length === CAPACITY) {
+        for (let i = 0; i < CAPACITY; i++) {
+            const slot = currentSlots[i];
+            let item = slot.querySelector(".queue-item");
+            if (qArr[i] !== null) {
+                if (!item) {
+                    item = document.createElement("div");
+                    item.className = "queue-item";
+                    slot.appendChild(item);
+                }
+                item.innerText = qArr[i];
+                item.className = "queue-item";
+                if (highlights[i]) {
+                    item.classList.add(highlights[i]);
+                }
+            } else {
+                if (item) {
+                    item.remove();
+                }
+            }
+
+            const badges = slot.querySelectorAll(".pointer-label");
+            badges.forEach(b => b.remove());
+            drawPointersForSlot(slot, i, f, r);
+        }
+        updateInfoPanel(f, r, sz);
+        return;
+    }
+
     container.innerHTML = "";
 
     if (queueType === "circular") {

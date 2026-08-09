@@ -2,9 +2,13 @@
   "name": "dsa-visualizer-root",
   "version": "1.0.0",
   "description": "DSA Visualizer Root package for Vercel deployment",
+  "scripts": {
+    "start": "node Backend/server.js"
+  },
   "dependencies": {
     "dotenv": "^17.4.2",
     "express": "^4.19.2",
+    "mongodb": "^6.8.0",
     "nodemailer": "^9.0.4"
   }
 }

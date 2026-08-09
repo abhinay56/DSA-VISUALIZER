@@ -1,4 +1,4 @@
-class Node{
+class TreeNode{
 constructor(val){
 this.val=val
 this.left=null
@@ -246,7 +246,7 @@ return node
 
 function insertRB(val){
 
-let node=new Node(val)
+let node=new TreeNode(val)
 
 let y=null
 let x=root
@@ -379,7 +379,7 @@ x.parent=y
 function bstInsert(node,val){
 
 if(node==null){
-let n=new Node(val)
+let n=new TreeNode(val)
 n.color="black"
 return n
 }
@@ -396,7 +396,7 @@ return node
 
 function binaryInsert(node,val){
 
-let newNode=new Node(val)
+let newNode=new TreeNode(val)
 newNode.color="black"
 
 if(node==null) return newNode
@@ -463,7 +463,7 @@ return y
 function avlInsert(node,val){
 
 if(!node){
-let n=new Node(val)
+let n=new TreeNode(val)
 n.color="black"
 return n
 }

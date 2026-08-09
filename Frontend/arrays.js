@@ -147,6 +147,42 @@ document.addEventListener("DOMContentLoaded", () => {
 // Render helper
 function renderArrayState(arr, highlights = {}) {
     const container = document.getElementById("array-container");
+
+    const currentBars = container.querySelectorAll(".array-bar-wrapper");
+    if (arr.length > 0 && currentBars.length === arr.length) {
+        const maxVal = Math.max(...arr, 1);
+        const scale = Math.min(180 / maxVal, 8); // scaling factor, max height 180px
+
+        arr.forEach((val, idx) => {
+            const wrapper = currentBars[idx];
+            const bar = wrapper.querySelector(".array-bar");
+            if (bar) {
+                bar.innerText = val;
+                
+                // Calculate and set height
+                const height = 40 + (val * scale);
+                bar.style.height = `${height}px`;
+
+                // Remove dashed style if any
+                bar.style.border = "";
+                bar.style.background = "";
+                bar.style.boxShadow = "";
+
+                // Reset and apply highlights
+                bar.className = "array-bar";
+                if (highlights[idx]) {
+                    bar.classList.add(highlights[idx]);
+                }
+            }
+
+            const indexLabel = wrapper.querySelector(".array-index");
+            if (indexLabel) {
+                indexLabel.innerText = idx;
+            }
+        });
+        return;
+    }
+
     container.innerHTML = "";
 
     if (arr.length === 0) {

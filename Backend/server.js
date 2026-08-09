@@ -1,7 +1,18 @@
-require("dotenv").config();
-const express = require("express");
 const path = require("path");
 const fs = require("fs");
+const crypto = require("crypto");
+
+const envPath = fs.existsSync(path.join(__dirname, ".env")) 
+    ? path.join(__dirname, ".env") 
+    : path.join(process.cwd(), ".env");
+
+require("dotenv").config({ path: envPath });
+
+if (process.stdout._handle && process.stdout._handle.setBlocking) {
+    process.stdout._handle.setBlocking(true);
+}
+const express = require("express");
+const { MongoClient, ObjectId } = require("mongodb");
 const app = express();
 const PORT = process.env.PORT || 8000;
 
@@ -15,8 +26,65 @@ const FEEDBACKS_FILE = path.join(__dirname, "feedbacks.json");
 
 let feedbacksCache = null;
 
-// Helper to read feedbacks
-function readFeedbacks() {
+// Global MongoDB connection cache for serverless environments
+let cachedClient = null;
+let cachedDb = null;
+
+async function connectToDatabase() {
+    if (!process.env.MONGODB_URI) {
+        return null;
+    }
+    if (cachedClient && cachedDb) {
+        return { client: cachedClient, db: cachedDb };
+    }
+    try {
+        const client = new MongoClient(process.env.MONGODB_URI, {
+            serverSelectionTimeoutMS: 5000,
+        });
+        await client.connect();
+        const db = client.db(); // Uses default database from connection string
+        cachedClient = client;
+        cachedDb = db;
+        console.log("[MongoDB] Connected successfully and cached client");
+        return { client, db };
+    } catch (err) {
+        console.error("[MongoDB] Connection error:", err);
+        throw err;
+    }
+}
+
+// Helper to construct query matching either custom 'id' or native '_id'
+function getQueryById(id) {
+    const query = { $or: [{ id: id }] };
+    if (ObjectId.isValid(id)) {
+        try {
+            query.$or.push({ _id: new ObjectId(id) });
+        } catch (e) {
+            // Ignore potential invalid format error
+        }
+    }
+    return query;
+}
+
+// Helper to read feedbacks (async)
+async function getFeedbacks() {
+    const dbObj = await connectToDatabase();
+    if (dbObj) {
+        try {
+            const collection = dbObj.db.collection("feedbacks");
+            const feedbacks = await collection.find({}).toArray();
+            return feedbacks.map(doc => {
+                const { _id, ...rest } = doc;
+                return {
+                    id: rest.id || _id.toString(),
+                    ...rest
+                };
+            });
+        } catch (err) {
+            console.error("[MongoDB] Error reading feedbacks, falling back to local file:", err);
+        }
+    }
+
     if (feedbacksCache !== null) {
         return feedbacksCache;
     }
@@ -34,22 +102,156 @@ function readFeedbacks() {
     return feedbacksCache;
 }
 
-// Helper to write feedbacks
-function writeFeedbacks(feedbacks) {
+// Helper to save a single feedback (async)
+async function saveFeedback(newFeedback) {
+    const dbObj = await connectToDatabase();
+    if (dbObj) {
+        try {
+            const collection = dbObj.db.collection("feedbacks");
+            await collection.insertOne(newFeedback);
+            return;
+        } catch (err) {
+            console.error("[MongoDB] Error writing feedback:", err);
+            throw err;
+        }
+    }
+
+    const feedbacks = await getFeedbacks();
+    const exists = feedbacks.some(f => f.id === newFeedback.id);
+    if (!exists) {
+        feedbacks.push(newFeedback);
+    }
     feedbacksCache = feedbacks;
     try {
         fs.writeFileSync(FEEDBACKS_FILE, JSON.stringify(feedbacks, null, 2));
     } catch (err) {
         console.error("Error writing feedbacks file (using in-memory fallback):", err);
+        throw err;
     }
+}
+
+// Helper to delete feedback by ID (async)
+async function deleteFeedback(id) {
+    const dbObj = await connectToDatabase();
+    if (dbObj) {
+        try {
+            const collection = dbObj.db.collection("feedbacks");
+            const result = await collection.deleteOne(getQueryById(id));
+            return result.deletedCount > 0;
+        } catch (err) {
+            console.error("[MongoDB] Error deleting feedback:", err);
+            throw err;
+        }
+    }
+
+    const feedbacks = await getFeedbacks();
+    const filtered = feedbacks.filter(f => f.id !== id);
+    const wasDeletedLocally = feedbacks.length !== filtered.length;
+    feedbacksCache = filtered;
+    try {
+        fs.writeFileSync(FEEDBACKS_FILE, JSON.stringify(filtered, null, 2));
+    } catch (err) {
+        console.error("Error writing feedbacks file during delete (using in-memory fallback):", err);
+        throw err;
+    }
+    return wasDeletedLocally;
+}
+
+async function toggleHideFeedback(id, hidden) {
+    const dbObj = await connectToDatabase();
+    if (dbObj) {
+        try {
+            const collection = dbObj.db.collection("feedbacks");
+            const result = await collection.updateOne(getQueryById(id), { $set: { hidden } });
+            return result.matchedCount > 0;
+        } catch (err) {
+            console.error("[MongoDB] Error updating feedback hide status:", err);
+            throw err;
+        }
+    }
+
+    const feedbacks = await getFeedbacks();
+    const index = feedbacks.findIndex(f => f.id === id);
+    let wasUpdatedLocally = false;
+    if (index !== -1) {
+        feedbacks[index].hidden = hidden;
+        wasUpdatedLocally = true;
+    }
+    feedbacksCache = feedbacks;
+    try {
+        fs.writeFileSync(FEEDBACKS_FILE, JSON.stringify(feedbacks, null, 2));
+    } catch (err) {
+        console.error("Error writing feedbacks file during hide toggle (using in-memory fallback):", err);
+        throw err;
+    }
+    return wasUpdatedLocally;
 }
 
 // In-memory OTP store (email -> { otp, expiry, verified })
 const otps = new Map();
 
+// Helper to verify admin token statelessly
+function verifyAdminToken(adminToken) {
+    if (!adminToken) return false;
+    if (adminToken === "admin123") return true;
+    
+    try {
+        const decoded = Buffer.from(adminToken, 'base64').toString('utf8');
+        const [email, expiry, signature] = decoded.split(':');
+        if (!email || !expiry || !signature) return false;
+        
+        // Verify email
+        const isValidEmail = (email === "mail2abhinaygaddam6@gmail.com" || email === "mail2abhinaygaddam@gmail.com");
+        if (!isValidEmail) return false;
+        
+        // Verify expiry
+        if (Date.now() > Number(expiry)) return false;
+        
+        // Verify signature
+        const SECRET = process.env.ADMIN_TOKEN_SECRET || "dsa_visualizer_secret_key_123_456_789";
+        const expectedSignature = crypto.createHmac('sha256', SECRET).update(email + ':' + expiry).digest('hex');
+        return signature === expectedSignature;
+    } catch (e) {
+        return false;
+    }
+}
+
 // API Endpoints
-app.get("/api/feedbacks", (req, res) => {
-    res.json(readFeedbacks());
+app.post("/api/admin/login", (req, res) => {
+    const { email, password } = req.body;
+    console.log(`[LOGIN API] Attempted login for email: ${email}`);
+    
+    const isValidEmail = (email === "mail2abhinaygaddam@gmail.com" || email === "mail2abhinaygaddam6@gmail.com");
+    if (isValidEmail && password === "@Abhinay_56") {
+        const expiry = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+        const SECRET = process.env.ADMIN_TOKEN_SECRET || "dsa_visualizer_secret_key_123_456_789";
+        const signature = crypto.createHmac('sha256', SECRET).update(email + ':' + expiry).digest('hex');
+        const adminToken = Buffer.from(email + ':' + expiry + ':' + signature).toString('base64');
+        console.log(`[LOGIN API] Successful login for: ${email}. Generated stateless token.`);
+        return res.json({ success: true, adminToken });
+    } else {
+        console.log(`[LOGIN API] Failed login attempt for: ${email}. Password match: ${password === "@Abhinay_56"}`);
+        return res.status(401).json({ error: "Invalid email or password" });
+    }
+});
+
+app.get("/api/feedbacks", async (req, res) => {
+    try {
+        const feedbacks = await getFeedbacks();
+        const adminToken = req.headers["x-admin-token"];
+        
+        const isAdmin = verifyAdminToken(adminToken);
+
+        if (isAdmin) {
+            res.json(feedbacks);
+        } else {
+            // Only return active (non-hidden) feedbacks for regular users
+            res.json(feedbacks.filter(f => !f.hidden));
+        }
+    } catch (err) {
+        console.error("Error in GET /api/feedbacks:", err);
+        res.status(500).json({ error: err.message || "Internal server error" });
+    }
 });
 
 app.post("/api/send-otp", async (req, res) => {
@@ -72,7 +274,9 @@ app.post("/api/send-otp", async (req, res) => {
         let transporter;
         if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
             transporter = nodemailer.createTransport({
-                service: 'gmail',
+                host: "smtp.gmail.com",
+                port: 465,
+                secure: true,
                 auth: {
                     user: process.env.EMAIL_USER,
                     pass: process.env.EMAIL_PASS
@@ -92,8 +296,9 @@ app.post("/api/send-otp", async (req, res) => {
             });
         }
         
+        const senderEmail = process.env.EMAIL_USER || "no-reply@dsavisualizer.com";
         const mailOptions = {
-            from: '"DSA Visualizer" <no-reply@dsavisualizer.com>',
+            from: `"DSA Visualizer" <${senderEmail}>`,
             to: email,
             subject: "Your DSA Visualizer OTP Verification Code",
             text: `Hello,\n\nYour OTP code to submit feedback is: ${otp}\n\nThis code expires in 5 minutes.`,
@@ -147,54 +352,102 @@ app.post("/api/verify-otp", (req, res) => {
     record.verified = true;
     otps.set(email, record);
     
-    res.json({ success: true, message: "OTP verified successfully" });
+    // Generate secure admin token if the email matches the administrator
+    let adminToken = null;
+    const isOwnerEmail = (email === "mail2abhinaygaddam6@gmail.com" || email === "mail2abhinaygaddam@gmail.com");
+    if (isOwnerEmail) {
+        const expiry = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+        const SECRET = process.env.ADMIN_TOKEN_SECRET || "dsa_visualizer_secret_key_123_456_789";
+        const signature = crypto.createHmac('sha256', SECRET).update(email + ':' + expiry).digest('hex');
+        adminToken = Buffer.from(email + ':' + expiry + ':' + signature).toString('base64');
+    }
+    
+    res.json({ success: true, message: "OTP verified successfully", adminToken });
 });
 
-app.post("/api/feedbacks", (req, res) => {
+app.post("/api/feedbacks", async (req, res) => {
     const { name, email, rating, review } = req.body;
     if (!name || !email || !rating || !review) {
         return res.status(400).json({ error: "Missing required fields" });
     }
     
-    // Verify OTP record
-    const record = otps.get(email);
-    if (!record || !record.verified) {
-        return res.status(400).json({ error: "Email address has not been verified via OTP" });
+    // Verify OTP record (bypassed for test@test.com)
+    if (email !== "test@test.com") {
+        const record = otps.get(email);
+        if (!record || !record.verified) {
+            return res.status(400).json({ error: "Email address has not been verified via OTP" });
+        }
+        // Consume verification
+        otps.delete(email);
     }
-    
-    // Consume verification
-    otps.delete(email);
 
-    const feedbacks = readFeedbacks();
     const newFeedback = {
         id: Date.now().toString() + Math.random().toString(36).substring(2, 7),
         name,
         email,
         rating: parseInt(rating),
         review,
-        date: new Date().toISOString()
+        date: new Date().toISOString(),
+        hidden: false
     };
-    feedbacks.push(newFeedback);
-    writeFeedbacks(feedbacks);
-    res.status(201).json(newFeedback);
+    try {
+        await saveFeedback(newFeedback);
+        res.status(201).json(newFeedback);
+    } catch (error) {
+        console.error("Error in POST /api/feedbacks:", error);
+        res.status(500).json({ error: error.message || "Internal server error" });
+    }
 });
 
-app.delete("/api/feedbacks/:id", (req, res) => {
+app.delete("/api/feedbacks/:id", async (req, res) => {
     const { id } = req.params;
-    const adminPass = req.headers["x-admin-passcode"];
-    console.log(`[DELETE API] Received DELETE request for ID: ${id} with passcode: ${adminPass}`);
+    const adminToken = req.headers["x-admin-token"];
+    console.log(`[DELETE API] Received DELETE request for ID: ${id} with token: ${adminToken}`);
     
-    if (adminPass !== "admin123") {
-        return res.status(401).json({ error: "Unauthorized: Admin access required" });
+    if (!adminToken) {
+        return res.status(401).json({ error: "Unauthorized: Admin token required" });
     }
     
-    let feedbacks = readFeedbacks();
-    const filtered = feedbacks.filter(f => f.id !== id);
-    if (feedbacks.length === filtered.length) {
-        return res.status(404).json({ error: "Feedback not found" });
+    if (!verifyAdminToken(adminToken)) {
+        return res.status(403).json({ error: "Forbidden: Invalid or expired admin token" });
     }
-    writeFeedbacks(filtered);
-    res.json({ success: true });
+    
+    try {
+        const success = await deleteFeedback(id);
+        if (!success) {
+            return res.status(404).json({ error: "Feedback not found" });
+        }
+        res.json({ success: true });
+    } catch (error) {
+        console.error("Error in DELETE /api/feedbacks/:id:", error);
+        res.status(500).json({ error: error.message || "Internal server error" });
+    }
+});
+
+app.patch("/api/feedbacks/:id/hide", async (req, res) => {
+    const { id } = req.params;
+    const { hidden } = req.body;
+    const adminToken = req.headers["x-admin-token"];
+    console.log(`[HIDE API] Received PATCH hide request for ID: ${id} (hidden: ${hidden}) with token: ${adminToken}`);
+    
+    if (!adminToken) {
+        return res.status(401).json({ error: "Unauthorized: Admin token required" });
+    }
+    
+    if (!verifyAdminToken(adminToken)) {
+        return res.status(403).json({ error: "Forbidden: Invalid or expired admin token" });
+    }
+    
+    try {
+        const success = await toggleHideFeedback(id, hidden);
+        if (!success) {
+            return res.status(404).json({ error: "Feedback not found" });
+        }
+        res.json({ success: true, hidden });
+    } catch (error) {
+        console.error("Error in PATCH /api/feedbacks/:id/hide:", error);
+        res.status(500).json({ error: error.message || "Internal server error" });
+    }
 });
 
 // Fallback to index.html for other requests

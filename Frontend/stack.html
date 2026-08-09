@@ -12,26 +12,81 @@
 
 <body>
 
-<div class="navbar">
-<div class="logo">DSA Visualizer</div>
+    <!-- PREMIUM FLOATING NAVBAR -->
+    <nav class="premium-navbar">
+        <div class="nav-container">
+            <!-- LEFT: Logo & Name -->
+            <a href="index.html" class="nav-logo-link">
+                <div class="nav-logo">
+                    <span class="logo-text">DSA Visualizer</span>
+                </div>
+            </a>
 
-<div class="menu-toggle" onclick="toggleMenu()">☰</div>
+            <!-- CENTER: Navigation Links -->
+            <div class="nav-center-menu">
+                <ul class="nav-links-list">
+                    <li><a href="index.html" class="nav-link" id="link-home">Home</a></li>
+                    <li><a href="arrays.html" class="nav-link" id="link-arrays">Arrays</a></li>
+                    <li><a href="stack.html" class="nav-link" id="link-stack">Stack</a></li>
+                    <li><a href="queue.html" class="nav-link" id="link-queue">Queue</a></li>
+                    <li><a href="linkedlist.html" class="nav-link" id="link-linkedlist">Linked List</a></li>
+                    <li><a href="trees.html" class="nav-link" id="link-trees">Trees</a></li>
+                    <li><a href="graphs.html" class="nav-link" id="link-graphs">Graphs</a></li>
+                    <li><a href="index.html#learn" class="nav-link" id="link-learn">Learn</a></li>
+                    <li><a href="feedback.html" class="nav-link" id="link-feedback">Feedback</a></li>
+                </ul>
+            </div>
 
-<ul class="navLinks" id="navLinks">
-<li><a href="index.html">Home</a></li>
-<li><a href="arrays.html">Arrays</a></li>
-<li><a href="stack.html" class="active">Stack</a></li>
-<li><a href="queue.html">Queue</a></li>
-<li><a href="linkedlist.html">Linked List</a></li>
-<li><a href="trees.html">Trees</a></li>
-<li><a href="graphs.html">Graphs</a></li>
-<li><a href="feedback.html">Feedback</a></li>
-</ul>
+            <!-- RIGHT: Icons -->
+            <div class="nav-right-actions">
+                <!-- Theme Toggle -->
+                <button class="nav-icon-btn theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle Theme">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon sun-icon"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon moon-icon"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon zap-icon"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </button>
 
-<button class="themeBtn" onclick="toggleTheme()">
-<span id="themeIcon">⚙️</span>
-</button>
-</div>
+                <!-- Hamburger (Mobile) -->
+                <button class="nav-icon-btn hamburger-btn" onclick="toggleMobileDrawer()" aria-label="Open Menu">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12" />
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <line x1="3" y1="18" x2="21" y2="18" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="mobile-nav-drawer" id="mobileNavDrawer">
+        <div class="drawer-header">
+            <span class="drawer-logo-text">DSA Visualizer</span>
+            <button class="nav-icon-btn close-drawer-btn" onclick="toggleMobileDrawer()" aria-label="Close Menu">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+        <ul class="drawer-links-list">
+            <li><a href="index.html" class="drawer-link" id="drawer-link-home">Home</a></li>
+            <li><a href="arrays.html" class="drawer-link" id="drawer-link-arrays">Arrays</a></li>
+            <li><a href="stack.html" class="drawer-link" id="drawer-link-stack">Stack</a></li>
+            <li><a href="queue.html" class="drawer-link" id="drawer-link-queue">Queue</a></li>
+            <li><a href="linkedlist.html" class="drawer-link" id="drawer-link-linkedlist">Linked List</a></li>
+            <li><a href="trees.html" class="drawer-link" id="drawer-link-trees">Trees</a></li>
+            <li><a href="graphs.html" class="drawer-link" id="drawer-link-graphs">Graphs</a></li>
+            <li><a href="index.html#learn" class="drawer-link" id="drawer-link-learn">Learn</a></li>
+            <li><a href="feedback.html" class="drawer-link" id="drawer-link-feedback">Feedback</a></li>
+        </ul>
+        <div class="drawer-footer-actions">
+            <div class="drawer-action-buttons">
+                <button class="drawer-action-btn" onclick="toggleTheme()">Change Theme</button>
+                <a href="https://github.com/abhinay56/DSA-VISUALIZER" target="_blank" rel="noopener" class="drawer-action-btn">GitHub Repo</a>
+            </div>
+        </div>
+    </div>
 
 <!-- CONTAINER -->
 <div class="container">

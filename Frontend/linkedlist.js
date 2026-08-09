@@ -107,6 +107,59 @@ document.addEventListener("DOMContentLoaded", () => {
 // Render the linked list node-by-node
 function renderListState(nodes, highlights = {}, arrows = {}) {
     const container = document.getElementById("ll-container");
+
+    // Helper to get arrow color based on active theme
+    function getArrowColor() {
+        const body = document.body;
+        let arrowColor = "#3b82f6";
+        if (body.classList.contains("neon-mode")) arrowColor = "#d946ef";
+        else if (body.classList.contains("light-mode")) arrowColor = "#2563eb";
+        return arrowColor;
+    }
+
+    // Determine if structural DOM representation can be updated in-place (same structure & order)
+    const currentDomWrappers = Array.from(container.querySelectorAll(".ll-node-wrapper"));
+    const currentDomIds = currentDomWrappers.map(el => el.id.replace("wrapper_", ""));
+    const targetIds = nodes.map(node => node.id);
+
+    const isSameStructure = (currentDomIds.length === targetIds.length) && currentDomIds.every((id, idx) => id === targetIds[idx]);
+
+    if (isSameStructure && nodes.length > 0) {
+        // Just update existing elements to prevent flashing and enable smooth transitions
+        nodes.forEach((node, idx) => {
+            const wrapper = document.getElementById(`wrapper_${node.id}`);
+            if (!wrapper) return;
+
+            const nodeBox = wrapper.querySelector(".ll-node");
+            if (nodeBox) {
+                // Update highlights
+                nodeBox.className = "ll-node";
+                if (highlights[node.id]) {
+                    nodeBox.classList.add(highlights[node.id]);
+                }
+            }
+
+            // Update arrow highlights
+            const arrowDiv = wrapper.querySelector(".ll-arrow");
+            if (arrowDiv) {
+                const isHighlighted = arrows[node.id];
+                const activeColor = isHighlighted ? '#fbbf24' : getArrowColor();
+                const lines = arrowDiv.querySelectorAll("line");
+                lines.forEach(line => line.setAttribute("stroke", activeColor));
+                const paths = arrowDiv.querySelectorAll("path");
+                paths.forEach(path => path.setAttribute("fill", activeColor));
+            }
+        });
+
+        // Re-draw circular loopbacks (they are SVGs drawn on top of container)
+        if (currentListType === "circular" || currentListType === "circular_doubly") {
+            setTimeout(() => {
+                drawCircularLoopbacks(nodes);
+            }, 50);
+        }
+        return;
+    }
+
     container.innerHTML = "";
 
     // Clear old loopbacks
@@ -839,6 +892,191 @@ function deleteAtIndex() {
 
     list = temp;
     document.getElementById("deleteIndex").value = "";
+    animator.play();
+    showMessage("Node Deleted Successfully");
+}
+
+function deleteByValue() {
+    animator.clear();
+    const val = parseInt(document.getElementById("deleteValue").value);
+    if (isNaN(val)) {
+        showMessage("Please enter a value to delete.", "error");
+        return;
+    }
+
+    if (list.length === 0) {
+        showMessage("List is empty. Nothing to delete.", "error");
+        return;
+    }
+
+    let temp = [...list];
+    let foundIdx = -1;
+    for (let i = 0; i < temp.length; i++) {
+        if (temp[i].val === val) {
+            foundIdx = i;
+            break;
+        }
+    }
+
+    if (foundIdx === -1) {
+        // Not found traversal animation
+        let h = {};
+        let a = {};
+        animator.addFrame(temp, {}, {}, {
+            operation: "Delete by Value",
+            value: val,
+            description: `Start searching for node with value ${val} to delete.`,
+            timeComplexity: "O(n)",
+            spaceComplexity: "O(1)"
+        });
+
+        for (let i = 0; i < temp.length; i++) {
+            h = { [temp[i].id]: 'compare' };
+            a = {};
+            for (let j = 0; j < i; j++) {
+                a[temp[j].id] = true;
+            }
+
+            animator.addFrame(temp, h, a, {
+                operation: "Delete by Value",
+                value: val,
+                description: `Compare target value ${val} with node value ${temp[i].val}. Not a match.`,
+                extra: { "Current Index": i, "Match Status": "No Match" },
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)"
+            });
+        }
+
+        animator.addFrame(temp, {}, {}, {
+            operation: "Delete by Value",
+            value: val,
+            description: `Reached end of the list. Node with value ${val} not found.`,
+            extra: { "Result": "Not Found" },
+            timeComplexity: "O(n)",
+            spaceComplexity: "O(1)"
+        });
+
+        animator.play();
+        showMessage(`Node with value ${val} not found in the list.`, "error");
+        return;
+    }
+
+    // Node is found, animate traversal to foundIdx and then delete it
+    let targetId = temp[foundIdx].id;
+    let h = {};
+    let a = {};
+
+    animator.addFrame(temp, {}, {}, {
+        operation: "Delete by Value",
+        value: val,
+        description: `Start searching for node with value ${val} to delete.`,
+        timeComplexity: "O(n)",
+        spaceComplexity: "O(1)"
+    });
+
+    for (let i = 0; i <= foundIdx; i++) {
+        h = {};
+        a = {};
+        for (let j = 0; j < i; j++) {
+            a[temp[j].id] = true;
+        }
+
+        if (i === foundIdx) {
+            h[temp[i].id] = 'active';
+            animator.addFrame(temp, h, a, {
+                operation: "Delete by Value",
+                value: val,
+                description: `Found node: value ${temp[i].val} matches target value ${val} at index ${i}.`,
+                extra: { "Index": i, "Match Status": "Match Found" },
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)"
+            });
+        } else {
+            h[temp[i].id] = 'compare';
+            animator.addFrame(temp, h, a, {
+                operation: "Delete by Value",
+                value: val,
+                description: `Compare target value ${val} with node value ${temp[i].val}. Not a match.`,
+                extra: { "Current Index": i, "Match Status": "No Match" },
+                timeComplexity: "O(n)",
+                spaceComplexity: "O(1)"
+            });
+        }
+    }
+
+    if (foundIdx === 0) {
+        // Delete from beginning
+        h = { [targetId]: 'swap' };
+        animator.addFrame(temp, h, {}, {
+            operation: "Delete by Value",
+            value: val,
+            description: `Node with value ${val} is the head node. Prepare to remove it.`,
+            timeComplexity: "O(1)",
+            spaceComplexity: "O(1)"
+        });
+
+        temp.shift();
+        animator.addFrame(temp, {}, {}, {
+            operation: "Delete by Value",
+            value: val,
+            description: `Updated head pointer to point to next node. Node with value ${val} deleted.`,
+            timeComplexity: "O(1)",
+            spaceComplexity: "O(1)"
+        });
+    } else if (foundIdx === list.length - 1) {
+        // Delete from end
+        let predecessorId = temp[foundIdx - 1].id;
+        h = { [predecessorId]: 'compare', [targetId]: 'swap' };
+        a = {};
+        for (let j = 0; j < foundIdx - 1; j++) {
+            a[temp[j].id] = true;
+        }
+
+        animator.addFrame(temp, h, a, {
+            operation: "Delete by Value",
+            value: val,
+            description: `Node with value ${val} is the tail node. Set next pointer of second-to-last node (index ${foundIdx - 1}) to NULL.`,
+            timeComplexity: "O(n)",
+            spaceComplexity: "O(1)"
+        });
+
+        temp.pop();
+        animator.addFrame(temp, {}, a, {
+            operation: "Delete by Value",
+            value: val,
+            description: `Removed tail node. Node with value ${val} deleted successfully.`,
+            timeComplexity: "O(n)",
+            spaceComplexity: "O(1)"
+        });
+    } else {
+        // Delete from middle
+        let predecessorId = temp[foundIdx - 1].id;
+        h = { [predecessorId]: 'compare', [targetId]: 'swap' };
+        a = {};
+        for (let j = 0; j < foundIdx - 1; j++) {
+            a[temp[j].id] = true;
+        }
+
+        animator.addFrame(temp, h, a, {
+            operation: "Delete by Value",
+            value: val,
+            description: `Point the next arrow of predecessor node (index ${foundIdx - 1}) directly to successor node (index ${foundIdx + 1}).`,
+            timeComplexity: "O(n)",
+            spaceComplexity: "O(1)"
+        });
+
+        temp.splice(foundIdx, 1);
+        animator.addFrame(temp, {}, a, {
+            operation: "Delete by Value",
+            value: val,
+            description: `Unlinked target node successfully. Node with value ${val} deleted.`,
+            timeComplexity: "O(n)",
+            spaceComplexity: "O(1)"
+        });
+    }
+
+    list = temp;
+    document.getElementById("deleteValue").value = "";
     animator.play();
     showMessage("Node Deleted Successfully");
 }
